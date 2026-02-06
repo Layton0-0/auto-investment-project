@@ -1,0 +1,180 @@
+---
+description: 
+alwaysApply: true
+---
+
+Security Mindset
+
+Client-side code is never trusted
+
+All data from the browser is considered untrusted input
+
+Frontend security complements backend security but never replaces it
+
+Security decisions must be intentional, explicit, and documented
+
+Input Handling and Validation
+
+Never trust user input, even from controlled components
+
+Validate and sanitize inputs both on the client and server
+
+Client-side validation is for UX only, never for security enforcement
+
+Avoid using user input directly in logic, queries, or rendering
+
+Always assume inputs can be malformed or malicious
+
+XSS (Cross-Site Scripting) Prevention
+
+Never use dangerouslySetInnerHTML unless absolutely unavoidable
+
+If HTML injection is required, sanitize content with a proven library
+
+Do not render raw HTML from external or user-provided sources
+
+Escape dynamic content by default
+
+Avoid DOM manipulation outside React’s rendering lifecycle
+
+Authentication and Authorization
+
+Authentication logic must never rely on frontend state alone
+
+Never store sensitive data in localStorage or sessionStorage
+
+Prefer HttpOnly, Secure cookies for authentication tokens
+
+Authorization checks must always be enforced on the backend
+
+Frontend authorization is strictly for UI gating, not security
+
+Token and Credential Handling
+
+Access tokens must be short-lived
+
+Refresh tokens must never be exposed to JavaScript
+
+Never log tokens, credentials, or sensitive identifiers
+
+Immediately clear sensitive data on logout or session expiration
+
+Assume tokens can be compromised and design for rotation
+
+API Communication
+
+All API communication must use HTTPS
+
+Do not expose internal API structure or error details
+
+Rate limiting and abuse protection are backend responsibilities
+
+Validate all API responses before using them in the UI
+
+Handle authorization failures gracefully and consistently
+
+CSRF (Cross-Site Request Forgery) Protection
+
+Use SameSite cookies whenever possible
+
+Include CSRF tokens for state-changing requests
+
+Never rely solely on CORS for CSRF protection
+
+Treat authenticated requests as potential attack vectors
+
+Dependency and Supply Chain Security
+
+Regularly audit third-party dependencies
+
+Avoid unmaintained or low-reputation packages
+
+Lock dependency versions and review updates carefully
+
+Do not introduce dependencies for trivial functionality
+
+Treat build-time tools as part of the attack surface
+
+Configuration and Environment Safety
+
+Never commit secrets, keys, or credentials to the repository
+
+Environment variables prefixed for frontend exposure must be reviewed
+
+Do not expose internal URLs, feature flags, or debug settings
+
+Production builds must disable debug tools and verbose logs
+
+Separate development, staging, and production configurations
+
+Error Handling and Information Leakage
+
+Never expose stack traces or internal errors to users
+
+Error messages must be generic and non-revealing
+
+Log sensitive errors securely and centrally
+
+Avoid conditional behavior that leaks security state
+
+Assume attackers read your error messages
+
+File Upload and External Content
+
+Never trust file metadata or MIME types from the client
+
+Enforce file size and type validation on the server
+
+Avoid previewing untrusted files directly in the browser
+
+Use secure URLs or signed URLs for file access
+
+Treat all external content as hostile
+
+Routing and Navigation Security
+
+Route guards are UX mechanisms, not security boundaries
+
+Never rely on hidden routes for protection
+
+Validate route parameters before usage
+
+Prevent open redirects and URL injection
+
+Ensure logout invalidates all protected routes
+
+Build and Deployment Security
+
+Source maps must not be publicly exposed in production
+
+Minification and obfuscation do not equal security
+
+Ensure CI/CD pipelines restrict secret access
+
+Production artifacts must be immutable and traceable
+
+Review security impact before enabling experimental features
+
+Monitoring and Incident Awareness
+
+Detect and log abnormal frontend behavior
+
+Track authentication failures and suspicious flows
+
+Integrate frontend error tracking with security monitoring
+
+Prepare rollback strategies for compromised releases
+
+Security incidents require post-mortem and rule updates
+
+Senior Developer Responsibility
+
+Security trade-offs must be consciously made and documented
+
+Never dismiss security concerns as “backend-only problems”
+
+Educate the team on common frontend attack vectors
+
+Assume attackers understand React as well as you do
+
+A secure frontend is a maintained process, not a one-time task

@@ -1,0 +1,105 @@
+---
+description: 
+alwaysApply: true
+---
+
+1. Core Principles
+
+* React is a pure function of state; this rule must never be violated
+* Predictability is prioritized over convenience
+* Long-term maintainability outweighs short-term delivery speed
+* Every line of code is written as if it will be read by someone new in six months
+
+2. Component Design
+
+* Each component must have a single responsibility
+* Separate presentational components from business logic
+* A single component file should not exceed 200 lines
+* More than five props is a design smell and requires refactoring
+* Conditional complexity is a strong signal to split components
+
+3. State Management
+
+* State must be minimal; derived state is not allowed
+* Clearly distinguish server state from client UI state
+* useState is limited to simple UI-related state
+* Complex state transitions must use useReducer
+* Global state is allowed only when truly shared
+* State updates must always be explicit and traceable
+
+4. Hooks Usage
+
+* Hooks must always be called at the top level
+* Hooks must never be called inside conditions, loops, or nested functions
+* useEffect is strictly for side effects
+* Business logic should not live inside useEffect
+* Dependency arrays must never be omitted; intentional exceptions require comments
+* useMemo and useCallback are applied only after confirmed performance issues
+
+5. Async Logic and API Calls
+
+* Components must not contain direct API call logic
+* All async logic must be extracted into services or custom hooks
+* Loading, success, and error states must be explicitly handled
+* Errors must be surfaced to the user or logged
+* Async flows should be cancelable whenever applicable
+
+6. Rendering and Performance
+
+* Always be conscious of unnecessary re-renders
+* Never use array indexes as keys
+* React.memo must not be overused
+* Performance optimization follows measurement, not assumption
+* Expensive rendering logic must be isolated and split
+
+7. Types and Safety (TypeScript)
+
+* The any type is forbidden
+* Types must be explicit rather than inferred by default
+* Props types define the public API of a component
+* API response types must follow a contract, not ad-hoc definitions
+* Null and undefined possibilities must be explicitly declared
+
+8. Project Structure and File Organization
+
+* Feature-based folder structure is the default
+* Components, hooks, services, and types must be clearly separated
+* Shared components are extracted only after reuse is proven
+* Avoid overusing index.ts when it obscures dependency flow
+* File names must always match component names
+
+9. Code Style and Readability
+
+* Readability is more important than brevity
+* Magic numbers and hard-coded strings must be replaced with constants
+* Nested conditionals should not exceed two levels
+* JSX must remain declarative; complex logic belongs outside
+* Comments should explain “why,” never “what”
+
+10. Error Handling and Resilience
+
+* The application must not crash due to isolated errors
+* Error Boundaries should be applied intentionally
+* Known errors must be handled; unknown errors must be logged
+* Console errors are never ignored
+
+11. Testing and Validation
+
+* Business logic must be isolated for testability
+* Logic tests take priority over UI tests
+* Tests verify behavior, not implementation details
+* Refactoring without tests is not allowed
+
+12. Collaboration and Long-Term Maintenance
+
+* If code needs explanation in review, it is already flawed
+* Abstractions that confuse teammates are failed abstractions
+* Stability is prioritized over speed
+* Framework tricks and excessive patterns are discouraged
+
+13. Senior Developer Responsibility
+
+* Solve problems through structure, not patches
+* Do not allow technical debt to accumulate unnoticed
+* Write code that junior developers can understand
+* Using React without understanding its internals is unacceptable
