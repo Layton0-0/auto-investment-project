@@ -1,5 +1,8 @@
 # Polyrepo 푸시 방법
 
+- **일상적인 푸시(서브모듈 기준):** [GIT-PUSH-WORKFLOW.md](GIT-PUSH-WORKFLOW.md) 참고.
+- **아래는 최초 레포 생성 및 첫 푸시** 절차입니다.
+
 Git은 설치되어 있고, 5개 저장소(investment-infra, investment-backend, investment-prediction-service, investment-data-collector, investment-frontend) 모두 **로컬에서 초기 커밋 및 main/develop 브랜치**까지 완료된 상태입니다.
 
 GitHub에 레포를 만들고 푸시하려면 **GitHub CLI(gh) 로그인**이 필요합니다.
