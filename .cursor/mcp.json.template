@@ -3,59 +3,49 @@
     "filesystem": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-filesystem",
-        "D:/works/pjt/investment-choi"
-      ]
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "D:/works/pjt/auto-investment-project"]
     },
     "github": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-github"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
-      }
-    },
-    "notion": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@notionhq/notion-mcp-server"
-      ],
-      "env": {
-        "NOTION_TOKEN": "${NOTION_TOKEN}"
-      }
-    },
-    "local-maria": {
-      "type": "stdio",
-      "command": "uv",
-      "args": [
-        "run",
-        "mcp-server-mariadb"
-      ],
-      "env": {
-        "DB_HOST": "localhost",
-        "DB_PORT": "3306",
-        "DB_USER": "local_maria",
-        "DB_PASSWORD": "local_maria_pass",
-        "MCP_READ_ONLY": "true"
-      }
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" }
     },
     "figma": {
       "type": "stdio",
       "command": "npx",
+      "args": ["-y", "figma-developer-mcp@latest"],
+      "env": { "FIGMA_API_KEY": "${FIGMA_API_KEY}" }
+    },
+    "ssh-mcp-oracle-osaka-yoon": {
+      "type": "stdio",
+      "command": "npx",
       "args": [
         "-y",
-        "figma-developer-mcp@latest"
-      ],
-      "env": {
-        "FIGMA_API_KEY": "${FIGMA_API_KEY}"
-      }
+        "ssh-mcp",
+        "--",
+        "--host=YOUR_ORACLE_OSAKA_PUBLIC_IP",
+        "--port=22",
+        "--user=ubuntu",
+        "--key=\"YOUR_SSH_KEY_PATH_OSAKA\"",
+        "--timeout=60000",
+        "--maxChars=none"
+      ]
+    },
+    "ssh-mcp-oracle-korea-jihee": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "ssh-mcp",
+        "--",
+        "--host=YOUR_ORACLE_KOREA_PUBLIC_IP",
+        "--port=22",
+        "--user=ubuntu",
+        "--key=\"YOUR_SSH_KEY_PATH_KOREA\"",
+        "--timeout=60000",
+        "--maxChars=none"
+      ]
     }
   }
 }

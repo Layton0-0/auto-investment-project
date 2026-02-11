@@ -16,6 +16,7 @@ When development is completed using a plan (via `mcp_create_plan` tool), the age
 2. **Execute tests directly** using the appropriate test command
    - Run tests: `.\scripts\run-tests.ps1` or `gradlew test`
    - Run tests with coverage: `.\scripts\run-tests-with-coverage.ps1` or `gradlew test jacocoTestReport`
+   - **Frontend/screen changes**: Prefer browser verification (cursor-ide-browser MCP) or run Playwright E2E: `cd investment-frontend && npm run e2e`
    - Verify all tests pass before considering the work complete
 
 3. **Iterate until all tests pass**
