@@ -27,7 +27,7 @@
         "--host=YOUR_ORACLE_OSAKA_PUBLIC_IP",
         "--port=22",
         "--user=ubuntu",
-        "--key=\"YOUR_SSH_KEY_PATH_OSAKA\"",
+        "--key=YOUR_SSH_KEY_PATH_OSAKA",
         "--timeout=60000",
         "--maxChars=none"
       ]
@@ -42,7 +42,22 @@
         "--host=YOUR_ORACLE_KOREA_PUBLIC_IP",
         "--port=22",
         "--user=ubuntu",
-        "--key=\"YOUR_SSH_KEY_PATH_KOREA\"",
+        "--key=YOUR_SSH_KEY_PATH_KOREA",
+        "--timeout=60000",
+        "--maxChars=none"
+      ]
+    },
+    "ssh-mcp-oracle-mumbai-yoon": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "ssh-mcp",
+        "--",
+        "--host=YOUR_ORACLE_MUMBAI_PUBLIC_IP",
+        "--port=22",
+        "--user=ubuntu",
+        "--key=YOUR_SSH_KEY_PATH_MUMBAI",
         "--timeout=60000",
         "--maxChars=none"
       ]
