@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "investment-backend"
+		},
+		{
+			"path": "investment-data-collector"
+		},
+		{
+			"path": "investment-front"
+		},
+		{
+			"path": "investment-infra"
+		},
+		{
+			"path": "investment-prediction-service"
+		}
+	],
+	"settings": {}
+}
