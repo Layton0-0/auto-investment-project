@@ -1,0 +1,18 @@
+[submodule "investment-backend"]
+	path = investment-backend
+	url = https://github.com/Layton0-0/investment-backend.git
+[submodule "investment-infra"]
+	path = investment-infra
+	url = https://github.com/Layton0-0/investment-infra.git
+[submodule "investment-data-collector"]
+	path = investment-data-collector
+	url = https://github.com/Layton0-0/investment-data-collector.git
+[submodule "investment-prediction-service"]
+	path = investment-prediction-service
+	url = https://github.com/Layton0-0/investment-prediction-service.git
+[submodule "smart-portfolio-pal"]
+	path = smart-portfolio-pal
+	url = https://github.com/Layton0-0/smart-portfolio-pal.git
+[submodule "investment-frontend"]
+	path = investment-frontend
+	url = https://github.com/Layton0-0/investment-front.git
