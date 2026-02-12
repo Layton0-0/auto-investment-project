@@ -1,0 +1,52 @@
+# CD 푸시 후 Agent가 직접 확인하는 방법
+
+사용자가 "푸시하고 확인해", "CD 돌려보고 결과 알려줘", "CD 정상화해줘" 등으로 요청할 때 Agent는 아래 순서로 진행한다.
+
+## 1. 푸시
+
+- `investment-infra` 변경분이 있으면 해당 디렉터리에서 `git add` → `git commit` → `git push origin main` 실행.
+- push to main 이면 CD 워크플로우가 자동으로 실행된다.
+
+## 2. 확인 (gh 우선, 미로그인 시 안내)
+
+### 방법 A: GitHub CLI (`gh`) — 권장
+
+1. **인증 확인**: `cd investment-infra` 후 `gh auth status` 실행.
+   - **미로그인**이면 사용자에게 **"CD 결과를 여기서 확인하려면 한 번만 `gh auth login` 해 주세요. 완료 후 다시 푸시/확인 요청하시면 `gh run watch`로 결과까지 확인해 드리겠습니다"** 안내.
+   - 로그인되어 있으면 아래 2–3 진행.
+2. **최근 run 조회** (push로 이미 실행됐다면): `gh run list --workflow=cd.yml --limit 1`
+3. **완료까지 감시** (성공/실패 exit code로 반환): `gh run watch --exit-status`  
+   또는 특정 run만: `gh run watch <run-id> --exit-status`
+
+**사전 조건**: [GitHub CLI](https://cli.github.com/) 설치 후 **한 번** `gh auth login` 완료. PAT 권한에 `workflow`(또는 repo) 있으면 됨.
+
+### 방법 B: GitHub Actions MCP
+
+Cursor MCP에 **GitHub Actions Trigger MCP**를 추가해 두었다면:
+
+1. **워크플로우 실행**: `trigger_github_action` (owner, repo, workflow_id=`cd.yml`, ref=`main`).
+2. **결과 확인**: 반환된 run 정보(status, url)를 사용자에게 전달. 필요 시 브라우저에서 Actions 탭 링크로 확인 안내.
+
+**MCP 추가 방법**: `.cursor/mcp.json`(또는 사용자 홈의 Cursor MCP 설정)에 다음 서버를 넣고, `GITHUB_TOKEN`(또는 `GITHUB_PERSONAL_ACCESS_TOKEN`) 환경 변수 설정.
+
+```json
+"github-actions-trigger": {
+  "type": "stdio",
+  "command": "npx",
+  "args": ["-y", "@nextdrive/github-action-trigger-mcp"],
+  "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" }
+}
+```
+
+(기존 `github` MCP와 동일한 토큰 사용 가능. 토큰 권한에 `workflow` 포함.)
+
+## 3. 결과 전달
+
+- **성공**: "CD가 완료되었습니다. Run URL: …" 형태로 요약.
+- **실패**: "CD가 실패했습니다. Run URL: … 에서 로그 확인 가능" 안내. 가능하면 실패한 step 이름만 짧게 언급.
+
+## 요약
+
+- **푸시는 항상** 로컬 git + push로 수행.
+- **확인**: `gh` 설치 시 `gh auth status`로 로그인 여부 확인 → 로그인돼 있으면 `gh run watch --exit-status`, 미로그인 시 한 번만 `gh auth login` 안내.
+- MCP(방법 B)가 있으면 trigger 후 run URL 전달. 둘 다 없으면 "Actions 탭에서 확인해 주세요" 안내.

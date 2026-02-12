@@ -11,6 +11,12 @@
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" }
     },
+    "github-actions-trigger": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@nextdrive/github-action-trigger-mcp"],
+      "env": { "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}" }
+    },
     "figma": {
       "type": "stdio",
       "command": "npx",
@@ -20,47 +26,17 @@
     "ssh-mcp-oracle-osaka-yoon": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "-y",
-        "ssh-mcp",
-        "--",
-        "--host=YOUR_ORACLE_OSAKA_PUBLIC_IP",
-        "--port=22",
-        "--user=ubuntu",
-        "--key=YOUR_SSH_KEY_PATH_OSAKA",
-        "--timeout=60000",
-        "--maxChars=none"
-      ]
+      "args": ["-y", "ssh-mcp", "--", "--host=YOUR_ORACLE_OSAKA_PUBLIC_IP", "--port=22", "--user=ubuntu", "--key=YOUR_SSH_KEY_PATH_OSAKA", "--timeout=60000", "--maxChars=none"]
     },
     "ssh-mcp-oracle-korea-jihee": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "-y",
-        "ssh-mcp",
-        "--",
-        "--host=YOUR_ORACLE_KOREA_PUBLIC_IP",
-        "--port=22",
-        "--user=ubuntu",
-        "--key=YOUR_SSH_KEY_PATH_KOREA",
-        "--timeout=60000",
-        "--maxChars=none"
-      ]
+      "args": ["-y", "ssh-mcp", "--", "--host=YOUR_ORACLE_KOREA_PUBLIC_IP", "--port=22", "--user=ubuntu", "--key=YOUR_SSH_KEY_PATH_KOREA", "--timeout=60000", "--maxChars=none"]
     },
     "ssh-mcp-oracle-mumbai-yoon": {
       "type": "stdio",
       "command": "npx",
-      "args": [
-        "-y",
-        "ssh-mcp",
-        "--",
-        "--host=YOUR_ORACLE_MUMBAI_PUBLIC_IP",
-        "--port=22",
-        "--user=ubuntu",
-        "--key=YOUR_SSH_KEY_PATH_MUMBAI",
-        "--timeout=60000",
-        "--maxChars=none"
-      ]
+      "args": ["-y", "ssh-mcp", "--", "--host=YOUR_ORACLE_MUMBAI_PUBLIC_IP", "--port=22", "--user=ubuntu", "--key=YOUR_SSH_KEY_PATH_MUMBAI", "--timeout=60000", "--maxChars=none"]
     }
   }
 }
