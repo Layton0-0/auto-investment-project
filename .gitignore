@@ -1,0 +1,8 @@
+# Environment and secrets (템플릿만 커밋)
+.env
+.env.local
+.env.*.local
+!.env.example
+# MCP 실제 설정 (템플릿만 커밋)
+mcp.json
+.cursor/mcp.json
