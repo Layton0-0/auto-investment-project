@@ -6,7 +6,7 @@
 
 ## 프로젝트명 (한 줄)
 
-**Investment Choi** — 한국투자증권 Open API 기반 주식 투자 수익 분석 및 자동 매매·로보어드바이저 시스템
+**Pulsarve (펄서브)** — 한국투자증권 Open API 기반 퀀트 엔진 자동투자·로보어드바이저 시스템 (주식 투자 수익 분석 및 자동 매매)
 
 ---
 
@@ -46,7 +46,7 @@
 
 ## 이력서에 넣을 때 (요약 버전)
 
-**프로젝트명**: Investment Choi — 주식 자동 매매·로보어드바이저
+**프로젝트명**: Pulsarve (펄서브) — 퀀트 엔진 기반 주식 자동 매매·로보어드바이저
 
 **기술 스택**: Java 17, Spring Boot 3.2, React 18, TypeScript, Vite 6, TimescaleDB, Redis, 한국투자증권 Open API, FastAPI(Python, LSTM), Docker, GitHub Actions, OCI 멀티 VPS
 
