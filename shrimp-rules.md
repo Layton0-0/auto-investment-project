@@ -38,6 +38,7 @@
 - **Lifecycle:** todo → in_progress → blocked | done. Only **one** task in_progress per context unless parallelization is explicit.
 - **Before coding:** Confirm current task, scope, and acceptance criteria.
 - **After coding:** Run tests/build, then mark task done and update docs (see §7).
+- **Task completion:** After shrimp-task-manager tasks are verified/completed, **always update [02-development-status.md](investment-backend/docs/09-planning/02-development-status.md)** — add to §1 Completed and add a version entry in §5.
 - **Blocked:** Set task to blocked with a clear reason; create a blocker-resolution task if needed.
 
 ---
