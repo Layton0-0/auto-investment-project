@@ -16,3 +16,6 @@
 [submodule "investment-frontend"]
 	path = investment-frontend
 	url = https://github.com/Layton0-0/investment-front.git
+[submodule "investment-front"]
+	path = investment-front
+	url = https://github.com/Layton0-0/investment-front.git
