@@ -1,0 +1,90 @@
+### 퀀트트레이더 전체 시스템 QA - REST Client
+### 사용법: 1) 아래 baseUrl 수정 2) 로그인 요청 실행 후 응답 body에서 token 복사해 @token 에 넣기 3) 나머지 요청은 Send Request로 순서대로 실행
+### 인증: Cookie보다 Authorization: Bearer 사용 권장 (동일 토큰으로 2~8번 일괄 실행 시 안정적)
+### 로컬 백엔드 로그를 켠 채로 각 요청 후 로그에서 traceId, 예외 메시지 확인
+
+@baseUrl = http://localhost
+@token = YOUR_JWT_HERE
+
+###############################################################################
+# 1. 로그인 — 예상: 200 (성공) / 401 (실패)
+###############################################################################
+# @name login
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "your_username",
+  "password": "your_password"
+}
+
+###############################################################################
+# 2. 마이페이지 — 예상: 200 (성공) / 401 (비인증) / 500 (서버 내부 오류 시 로그 확인)
+###############################################################################
+GET {{baseUrl}}/api/v1/auth/mypage
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+###############################################################################
+# 3. 시장데이터 - 단일 현재가 — 예상: 200 (인증 필요 시 401)
+###############################################################################
+GET {{baseUrl}}/api/v1/market-data/current-price/005930
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+###############################################################################
+# 4. 시장데이터 - 일봉 차트 — 예상: 404 (엔드포인트 미구현) / 인증 없으면 401
+###############################################################################
+GET {{baseUrl}}/api/v1/market-data/daily-chart?symbol=005930&market=KR
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+###############################################################################
+# 5. 설정 - 계좌 목록 — 예상: 200
+###############################################################################
+GET {{baseUrl}}/api/v1/settings/accounts
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+###############################################################################
+# 6. 설정 - 계좌별 조회 (설정 있음) — 예상: 200
+#    계좌번호를 DB에 존재하는 값으로 바꾸세요. 없으면 400 (SETTING_NOT_FOUND)
+###############################################################################
+@accountNo = 50161075-01
+GET {{baseUrl}}/api/v1/settings/{{accountNo}}
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+###############################################################################
+# 6-2. 설정 - 계좌별 조회 (설정 없음) — 예상: 400 (저장 후에는 200)
+###############################################################################
+GET {{baseUrl}}/api/v1/settings/69569325-01
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+###############################################################################
+# 7. 설정 - 계좌별 저장 — 예상: 200 (저장 성공)
+###############################################################################
+PUT {{baseUrl}}/api/v1/settings/{{accountNo}}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+{
+  "maxInvestmentAmount": 10000000,
+  "minInvestmentAmount": 100000,
+  "defaultCurrency": "KRW",
+  "autoTradingEnabled": false,
+  "roboAdvisorEnabled": false,
+  "riskLevel": 0.5,
+  "shortTermRatio": 0.2,
+  "mediumTermRatio": 0.4,
+  "longTermRatio": 0.4
+}
+
+###############################################################################
+# 8. 로그아웃 — 예상: 200
+###############################################################################
+POST {{baseUrl}}/api/v1/auth/logout
+Authorization: Bearer {{token}}
+Cookie: token={{token}}

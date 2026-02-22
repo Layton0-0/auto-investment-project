@@ -4,19 +4,8 @@
 			"path": "."
 		},
 		{
-			"path": "investment-backend"
-		},
-		{
-			"path": "investment-data-collector"
-		},
-		{
-			"path": "investment-front"
-		},
-		{
+			"name": "investment-infra",
 			"path": "investment-infra"
-		},
-		{
-			"path": "investment-prediction-service"
 		}
 	],
 	"settings": {}

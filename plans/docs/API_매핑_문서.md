@@ -109,3 +109,4 @@
 | 2026-02-21 | 최초 작성. 매핑 테이블 및 불일치 목록 산출. |
 | 2026-02-21 | 태스크2 검증: 프론트 호출 경로에 대응하는 백엔드 엔드포인트 모두 존재 확인. 누락·경로 불일치 없음. Backend-only API는 문서만 유지. |
 | 2026-02-21 | 태스크3 검증: Docker 로컬 풀스택 기동 후 로그인·mypage·settings/accounts·dashboard/performance-summary·batch/api/jobs·ops/health·risk/summary 호출 200 확인. |
+| 2026-02-21 | 태스크4: API 매핑 문서 커밋 후 루트 저장소 main 푸시 완료. CI는 각 서브모듈(investment-backend, investment-frontend, investment-infra)에서 해당 .github/workflows 실행. CD는 infra push to main 또는 workflow_dispatch 시 배포 스크립트 실행. |
