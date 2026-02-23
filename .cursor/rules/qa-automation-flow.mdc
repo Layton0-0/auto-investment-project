@@ -1,0 +1,36 @@
+---
+description: 전체 자동화 QA 7단계 파이프라인 — 실행 순서, 실패 시 원인 분석·수정·PR·재테스트 루프
+alwaysApply: true
+---
+
+# QA 자동화 플로우 (7단계 파이프라인)
+
+전체 자동화 QA 실행 시 아래 순서와 루프를 따른다.
+
+## 실행 순서 (3단계 → 4단계)
+
+1. **3단계 자동 테스트**  
+   `.\scripts\run-full-qa.ps1` 실행 시 다음이 순차 실행된다.  
+   - Backend (JUnit): `investment-backend\scripts\run-tests.ps1`  
+   - API 시나리오: `.\scripts\run-api-qa.ps1` (환경 변수 `QA_USERNAME`, `QA_PASSWORD` 필요)  
+   - Frontend E2E: `investment-frontend`에서 `npm run e2e`  
+   - 보안 점검: `investment-frontend`에서 `npm audit --audit-level=high`  
+
+2. **4단계 리포트 생성**  
+   실행 결과는 `plans/qa/reports/YYYYMMDD-HHMM-qa-report.md` 에 통합 QA 리포트로 저장된다.  
+   실패한 단계의 로그·스택·스크린샷 경로가 리포트에 기입된다.
+
+## 실패 시 루프 (5 → 6 → 7)
+
+- **5단계 실패 원인 분석**: Agent는 반드시 위 통합 리포트와 해당 단계 로그·스택·Playwright 스크린샷을 읽고, 실패 원인을 분석한 뒤 수정 포인트를 제안한다.  
+- **6단계 코드 수정·PR**: 분석을 바탕으로 코드를 수정한다. 필요 시 GitHub MCP로 `create_branch` → 커밋 푸시 → `create_pull_request` 로 PR을 생성한다.  
+- **7단계 재테스트**: 수정 반영 후 동일하게 `.\scripts\run-full-qa.ps1` 를 다시 실행한다.  
+  - **실패 시**: 4단계 리포트 갱신 → 5단계(실패 원인 분석) → 6단계(코드 수정·PR) → 7단계(재테스트) 를 반복한다.  
+  - **성공 시**: 루프 종료. PR 머지 또는 완료 처리.
+
+## 참고
+
+- 전체 QA 스크립트: [scripts/run-full-qa.ps1](scripts/run-full-qa.ps1)  
+- API 시나리오 스크립트: [scripts/run-api-qa.ps1](scripts/run-api-qa.ps1)  
+- 시나리오 SSoT: [plans/qa/QA_시나리오_마스터.md](plans/qa/QA_시나리오_마스터.md), [plans/qa/api-qa.http](plans/qa/api-qa.http)  
+- Agent 실행 시 `run-full-qa.ps1` 터미널 타임아웃은 600000ms(10분) 이상 권장. [script-run-timeouts.mdc](.cursor/rules/script-run-timeouts.mdc)

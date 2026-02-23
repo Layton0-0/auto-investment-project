@@ -1,0 +1,40 @@
+---
+description: Public 저장소 보안 규칙 — 커밋/문서에 비밀·키·토큰을 넣지 않도록 준수
+alwaysApply: true
+---
+
+# Public 저장소 보안 규칙 (필수)
+
+이 프로젝트의 **모든 GitHub 저장소는 Public**이다. 아래 규칙을 반드시 지킨다.
+
+## 1. 절대 커밋/기입 금지
+
+- **코드·문서·설정·이슈/PR**에 다음의 **실제 값**을 넣지 않는다.
+  - App Key, App Secret, API Key, PAT, JWT Secret
+  - DB 비밀번호, connection string(실제 호스트/비밀번호 포함)
+  - SSH private key, PEM 내용
+  - 배포 대상 서버의 실제 Public IP, 호스트명
+  - 계좌번호, 사용자 비밀번호, 암호화 키(실제 값)
+- **`.env`**, **`application-secret*.yml`**, **`mcp.json`**(실제 설정)은 **저장소에 커밋하지 않는다.**  
+  템플릿만 커밋: `.env.example`, `mcp.json.template` (값은 `YOUR_*`, `${VAR}` 플레이스홀더).
+
+## 2. 문서·예시 작성 시
+
+- 실제 비밀/키/IP 대신 **플레이스홀더**만 사용: `YOUR_APP_KEY`, `YOUR_LOCAL_DB_PASSWORD`, `https://your-api.example.com` 등.
+- "값은 환경 변수·GitHub Secrets·로컬 `.env`(커밋 제외)에만 설정한다" 문구를 배포/설정 문서에 명시한다.
+
+## 3. .gitignore
+
+- 각 저장소에 `.env`, `.env.local`, `mcp.json`, `.cursor/mcp.json`, `application-*-secret.yml`, `**/secrets/`, `*.secret` 등이 포함되어 있는지 확인한다.  
+  상세: [03-public-repository-security-rules.md](../investment-backend/docs/07-security/03-public-repository-security-rules.md) §3.
+
+## 4. 로깅
+
+- app key, secret, 계좌번호, userId 등은 **마스킹된 값만** 로그에 출력한다.  
+  백엔드: `LogMaskingUtil` 사용. [logging-masking.mdc](logging-masking.mdc), [02-security-configuration-reference.md](../investment-backend/docs/07-security/02-security-configuration-reference.md) 참조.
+
+## 5. PR/커밋 전 확인
+
+- 새 파일·문서에 실제 비밀/키/IP가 없고, `.gitignore`에 시크릿 관련 항목이 빠지지 않았는지 확인한 뒤 푸시한다.
+
+**전체 규칙**: [investment-backend/docs/07-security/03-public-repository-security-rules.md](../investment-backend/docs/07-security/03-public-repository-security-rules.md)

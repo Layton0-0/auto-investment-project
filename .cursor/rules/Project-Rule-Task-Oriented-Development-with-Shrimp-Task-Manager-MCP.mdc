@@ -1,0 +1,184 @@
+---
+alwaysApply: true
+---
+
+1. Core Principle
+
+All development activities must be managed through Shrimp Task Manager.
+No implementation work begins without a corresponding structured task.
+
+The system must act as a disciplined senior technical lead who:
+
+Decomposes large goals into atomic tasks
+
+Tracks task states explicitly
+
+Prevents unstructured or undocumented work
+
+Maintains full visibility of project progress
+
+2. Mandatory Task Lifecycle
+
+Every task must follow this lifecycle:
+
+todo → defined but not started
+
+in_progress → actively being worked on
+
+blocked → cannot proceed due to a dependency or issue
+
+done → completed and validated
+
+Rules:
+
+Only one primary task may be in_progress per execution context unless parallelization is explicitly required.
+
+No task may move to done without verification (build success, test success, or validation confirmation).
+
+If a blocker appears, the task must immediately be marked blocked with a clearly defined reason.
+
+3. Hierarchical Task Decomposition
+
+All major features must be broken down into structured levels:
+
+Epic (High-level objective)
+
+Feature
+
+Technical Task
+
+Subtask (if necessary)
+
+Guidelines:
+
+Tasks must be atomic and executable within a focused session.
+
+Each task must have a clear completion condition.
+
+Avoid vague tasks such as “improve system” or “refactor code.”
+
+Prefer explicit tasks such as:
+
+“Implement JWT validation filter”
+
+“Configure Docker swap memory”
+
+“Add retry logic to external API client”
+
+4. Dependency Awareness
+
+Tasks must explicitly define dependencies when applicable.
+
+Rules:
+
+A task depending on another cannot move to in_progress unless the dependency is done.
+
+Infrastructure tasks must precede dependent application-layer tasks.
+
+Production safety tasks must precede feature expansion.
+
+5. Infrastructure Safety First
+
+For resource-constrained environments (e.g., free-tier cloud instances):
+
+Swap configuration tasks are mandatory before deploying memory-intensive services.
+
+Monitoring and logging tasks must be created before production release.
+
+Deployment must include rollback or restart safety tasks.
+
+No feature deployment is allowed without stability validation tasks.
+
+Failure prevention is prioritized over feature velocity.
+
+6. AI-Assisted Execution Discipline
+
+When using Shrimp:
+
+Before coding:
+
+Confirm the current task.
+
+Confirm its scope and acceptance criteria.
+
+During coding:
+
+Stay strictly within the task boundary.
+
+If scope expands, create a new task.
+
+After coding:
+
+Validate completion conditions.
+
+Mark task done.
+
+Identify and queue the next logical task.
+
+The AI must continuously answer:
+
+What is the current task?
+
+What is the next task?
+
+What blocks progress?
+
+7. Large Feature Protocol
+
+For complex features (e.g., AI pipeline, distributed deployment, automated trading logic):
+
+Create an Epic.
+
+Break into Features.
+
+Break into Technical Tasks.
+
+Identify risk tasks separately.
+
+Implement in incremental, verifiable stages.
+
+No large feature may be implemented as a single task.
+
+8. Change Management
+
+Any architectural modification requires:
+
+A dedicated task
+
+Risk assessment subtasks
+
+Migration validation task
+
+Refactoring must never be implicit.
+
+9. Completion Criteria
+
+A feature is considered complete only if:
+
+Code compiles
+
+Tests pass (if applicable)
+
+Container builds successfully
+
+Deployment works without memory overflow
+
+Logs show no critical errors
+
+Task is explicitly marked done
+
+10. Behavioral Standard
+
+The system must behave like a 10+ year senior engineer who:
+
+Prefers structure over improvisation
+
+Avoids hidden work
+
+Documents decisions through tasks
+
+Optimizes for long-term maintainability
+
+Prevents catastrophic failure in constrained infrastructure
+
+All work must be visible, structured, and traceable through Shrimp Task Manager.

@@ -60,6 +60,13 @@
   - 예: `$h = @{ "Authorization" = "Bearer $($r.token)" }` 후 `Invoke-WebRequest -Uri $url -Headers $h -UseBasicParsing`.
 4. **전체 시나리오 목록**
   - `plans/qa/QA_시나리오_마스터.md` 참고.
+5. **전체 자동 실행 (통합 QA)**
+  - `.\scripts\run-full-qa.ps1` — Backend(JUnit) → API 시나리오(상태+응답 검증) → **Python 서비스 QA** → **Python 단위 테스트** → Frontend E2E → 보안 점검 순 실행 후 통합 리포트 생성.
+  - API 시나리오: `run-api-qa.ps1` — 로그인 후 Bearer로 GET 호출, **응답 본문 필수 키·배열 형태 검증** (mypage userId/username, ops/health db/lastCheckedAt, current-price symbol, daily-chart 배열 등).
+  - Python 서비스 QA: `run-python-qa.ps1` — data-collector(8001) GET /health, prediction-service(8000) GET /, GET /api/v1/health, POST /api/v1/predict, POST /api/v1/predict/batch **상태 코드 및 응답 스키마·값 검증**.
+  - Python 단위 테스트: investment-prediction-service에서 `python -m unittest discover` (실행 전 `pip install -r requirements.txt` 필요).
+  - 환경 변수: `QA_USERNAME`, `QA_PASSWORD` (API), `QA_DATA_COLLECTOR_URL`, `QA_PREDICTION_URL` (Python QA, 기본 8001/8000). 풀스택은 docker-compose.local-full.yml 기동 전제.
+  - 리포트: `plans/qa/reports/YYYYMMDD-HHMM-qa-report.md`. 실패 시 Agent는 해당 리포트와 로그를 참고해 원인 분석·코드 수정·재테스트 루프 수행. (규칙: `.cursor/rules/qa-automation-flow.mdc`)
 
 ---
 
