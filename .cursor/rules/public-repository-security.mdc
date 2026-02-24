@@ -17,6 +17,7 @@ alwaysApply: true
   - 계좌번호, 사용자 비밀번호, 암호화 키(실제 값)
 - **`.env`**, **`application-secret*.yml`**, **`mcp.json`**(실제 설정)은 **저장소에 커밋하지 않는다.**  
   템플릿만 커밋: `.env.example`, `mcp.json.template` (값은 `YOUR_*`, `${VAR}` 플레이스홀더).
+- **민감 파일 백업 위치**(프로젝트별·날짜별 보안 폴더)는 [sensitive-files-backup.mdc](sensitive-files-backup.mdc) 참조.
 
 ## 2. 문서·예시 작성 시
 

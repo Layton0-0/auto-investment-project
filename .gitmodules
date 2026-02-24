@@ -10,9 +10,6 @@
 [submodule "investment-prediction-service"]
 	path = investment-prediction-service
 	url = https://github.com/Layton0-0/investment-prediction-service.git
-[submodule "smart-portfolio-pal"]
-	path = smart-portfolio-pal
-	url = https://github.com/Layton0-0/smart-portfolio-pal.git
 [submodule "investment-frontend"]
 	path = investment-frontend
 	url = https://github.com/Layton0-0/investment-front.git

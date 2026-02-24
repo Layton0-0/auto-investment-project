@@ -182,3 +182,13 @@ Optimizes for long-term maintainability
 Prevents catastrophic failure in constrained infrastructure
 
 All work must be visible, structured, and traceable through Shrimp Task Manager.
+
+11. 수정사항 수신 시 (사용자 전달 수정사항)
+
+When the user sends modification requests ("수정해야 할 사항", "이렇게 바꿔줘", etc.):
+
+1. **Register as Shrimp task:** Use Shrimp MCP (e.g. `plan_task` with the request as description/goal) to create a task for each distinct modification. Title and description must clearly reflect what the user asked.
+2. **Process one by one:** Work on one task at a time (set in_progress → implement → verify → done). Do not batch multiple modifications into one implementation without splitting into tasks.
+3. **Pre-register follow-ups:** If during implementation you identify follow-up work (e.g. doc update elsewhere, same change for another screen, tests to add later), register those as **separate Shrimp tasks** immediately so they are not forgotten. Process them in order after the current task is done.
+
+Reference: [shrimp-rules.md §3.1](../shrimp-rules.md) (수정사항 수신 시 워크플로우).

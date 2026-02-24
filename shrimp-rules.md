@@ -41,6 +41,14 @@
 - **Task completion:** After shrimp-task-manager tasks are verified/completed, **always update [02-development-status.md](investment-backend/docs/09-planning/02-development-status.md)** — add to §1 Completed and add a version entry in §5.
 - **Blocked:** Set task to blocked with a clear reason; create a blocker-resolution task if needed.
 
+### 3.1 수정사항 수신 시 워크플로우 (사용자 전달 수정사항)
+
+- 사용자가 "수정해야 할 사항"을 보낼 때마다:
+  1. **Shrimp에 task 등록:** 해당 수정사항을 `plan_task`(또는 적절한 Shrimp 도구)로 등록한다. 제목·설명에 수정 요청 내용을 명확히 적는다.
+  2. **순차 처리:** 등록한 task를 하나씩 in_progress로 두고, `execute_task` 가이드에 따라 구현·검증 후 done 처리한다.
+  3. **후속 작업 선등록:** 구현 중에 "나중에 해야 할 작업"(예: 문서 보강, 다른 메뉴 동일 적용, 성능 측정 등)이 보이면 **즉시** Shrimp에 별도 task로 등록해 둔다. 한꺼번에 처리하지 말고, 현재 task 완료 후 다음 task로 이어가도록 한다.
+- 정리: **수정사항 → task 등록 → 하나씩 처리 → 후속은 미리 task 등록.**
+
 ---
 
 ## 4. Code Standards
