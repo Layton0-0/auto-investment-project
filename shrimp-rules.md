@@ -17,7 +17,7 @@
 
 | Module | Path | Role |
 |--------|------|------|
-| Backend | `investment-backend/` | Spring Boot 2.7.x (Java 11), Gradle. REST API, Thymeleaf, Batch, domain, repositories. TimescaleDB(PostgreSQL), Redis. |
+| Backend | `investment-backend/` | Spring Boot 2.7.x (Java 11), Gradle. REST API, Batch, domain, repositories. TimescaleDB(PostgreSQL), Redis. |
 | Frontend | `investment-frontend/` | React 18, TypeScript, Vite 6, Tailwind CSS 4, React Router 6. API client → Backend `/api/v1`. Vitest. |
 | Data collector (Python) | `investment-data-collector/` | FastAPI. DART 공시, SEC EDGAR, Yahoo 뉴스, US 일봉(yfinance) 수집. Spring 호출 또는 `POST /api/v1/internal/collected-news` 전달. Port 8001. |
 | Prediction (Python) | `investment-prediction-service/` | FastAPI. LSTM/ML 추론. `GET /api/v1/health`, `POST /api/v1/predict`. Backend가 HTTP 클라이언트로 호출. |
