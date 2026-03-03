@@ -14,6 +14,20 @@ $ErrorActionPreference = "Stop"
 if (-not $BaseUrl) { $BaseUrl = "http://localhost:8080" }
 if (-not $AccountNo) { $AccountNo = "50161075-01" }
 
+# Super Admin 기준: QA_USERNAME/QA_PASSWORD 미설정 시 investment-backend\.env 의 SUPER_ADMIN_* 사용
+if (-not $Username -or -not $Password) {
+    $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $repoRoot = Split-Path -Parent $scriptDir
+    $backendEnv = Join-Path $repoRoot "investment-backend\.env"
+    if (Test-Path $backendEnv) {
+        Get-Content $backendEnv -Encoding UTF8 -ErrorAction SilentlyContinue | ForEach-Object {
+            $line = $_.Trim()
+            if ($line -match '^\s*SUPER_ADMIN_USERNAME=(.+)$') { $script:Username = $Matches[1].Trim().Trim('"') }
+            if ($line -match '^\s*SUPER_ADMIN_PASSWORD=(.+)$') { $script:Password = $Matches[1].Trim().Trim('"') }
+        }
+    }
+}
+
 # 시나리오: Method, Path, ExpectedStatusCodes, OptionalResponseKeys(200일 때 응답 본문 검증할 필드).
 $scenarios = @(
     @{ Method = "GET";  Path = "/api/v1/auth/mypage"; Expected = @(200); ResponseKeys = @("userId", "username") },
@@ -65,8 +79,8 @@ $results = @()
 $allPass = $true
 
 if (-not $Username -or -not $Password) {
-    Write-Host "QA_USERNAME, QA_PASSWORD 환경 변수를 설정한 뒤 실행하세요. (비밀은 저장소에 커밋하지 마세요.)" -ForegroundColor Yellow
-    Write-Host "예: `$env:QA_USERNAME='your_username'; `$env:QA_PASSWORD='your_password'; .\scripts\run-api-qa.ps1" -ForegroundColor Gray
+    Write-Host "API QA: Super Admin 계정 필요. QA_USERNAME/QA_PASSWORD 또는 investment-backend\.env 의 SUPER_ADMIN_USERNAME, SUPER_ADMIN_PASSWORD 를 설정하세요." -ForegroundColor Yellow
+    Write-Host "예: .env 에 SUPER_ADMIN_USERNAME=..., SUPER_ADMIN_PASSWORD=... 또는 `$env:QA_USERNAME='...'; `$env:QA_PASSWORD='...'; .\scripts\run-api-qa.ps1" -ForegroundColor Gray
     exit 2
 }
 
