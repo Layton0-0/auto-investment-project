@@ -1,8 +1,10 @@
 ---
+description: 
 alwaysApply: true
 ---
 
-# 한국투자증권 API 개발 시 MCP 필수 사용
+계좌 관련 개발 시 한국투자증권 API MCP/github참고 필수 사용
+https://github.com/koreainvestment/open-trading-api?tab=readme-ov-file
 
 1. **무조건 사용**: 이 프로젝트에서 한국투자증권 API를 사용하는 모든 개발·수정은 **한국투자증권 MCP**를 반드시 활용한다.
 2. **사용 시점**:

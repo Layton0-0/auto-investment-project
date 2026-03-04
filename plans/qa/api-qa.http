@@ -83,7 +83,45 @@ Cookie: token={{token}}
 }
 
 ###############################################################################
-# 8. 로그아웃 — 예상: 200
+# 8. 모의계좌 API 연동 검증 — 주문·잔고·체결 (모의계좌만 사용)
+#    전제: .env에 KIS 모의투자 API 키 설정, TB_USER_ACCOUNTS에 모의계좌 등록
+#    순서: 잔고 조회 → 매수가능금액 조회 → (선택) 소액 주문 → 주문 목록 → 체결 확인
+###############################################################################
+@mockAccountNo = YOUR_MOCK_ACCOUNT_NO
+
+# 8-1. 모의계좌 잔고 조회 — 예상: 200 (한투 API 정상 시)
+GET {{baseUrl}}/api/v1/accounts/{{mockAccountNo}}/balance
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+# 8-2. 모의계좌 매수가능금액 (KR) — 예상: 200
+GET {{baseUrl}}/api/v1/accounts/{{mockAccountNo}}/buyable-amount?symbol=005930&price=50000&quantity=1
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+# 8-3. 모의계좌 주문 실행 (KR 매수 1주 — 실제 체결되므로 소액·1주 권장) — 예상: 200 + orderId
+POST {{baseUrl}}/api/v1/orders
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+{
+  "accountNo": "{{mockAccountNo}}",
+  "symbol": "005930",
+  "market": "KR",
+  "side": "BUY",
+  "quantity": 1,
+  "price": 50000,
+  "orderType": "LIMIT"
+}
+
+# 8-4. 주문 목록 조회 (orderId 확인용) — 예상: 200
+GET {{baseUrl}}/api/v1/orders?accountNo={{mockAccountNo}}
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+###############################################################################
+# 9. 로그아웃 — 예상: 200
 ###############################################################################
 POST {{baseUrl}}/api/v1/auth/logout
 Authorization: Bearer {{token}}

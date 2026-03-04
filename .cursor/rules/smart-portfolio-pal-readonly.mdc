@@ -1,0 +1,15 @@
+---
+description: smart-portfolio-pal 서브모듈은 읽기 전용 참조용이다. 이 저장소에서 수정한 내용은 smart-portfolio-pal에 반영하지 않는다.
+alwaysApply: true
+---
+
+# smart-portfolio-pal 서브모듈 읽기 전용
+
+1. **역할**: smart-portfolio-pal은 **퍼블/디자인 참조용** 서브모듈이다. 국내/미국 포함 전체 화면 퍼블 기준으로 사용한다.
+2. **읽기 전용**: 이 워크스페이스(auto-investment-project)에서는 smart-portfolio-pal을 **수정하지 않는다**.
+   - smart-portfolio-pal 내부 파일 편집·커밋·푸시 금지.
+   - 여기서 변경한 디자인·코드는 **investment-frontend**(또는 해당 적용 대상)에만 반영한다.
+3. **허용**: `git submodule update --init smart-portfolio-pal`, `cd smart-portfolio-pal && git pull` 등 **최신 참조만 가져오기**. 읽기(검토·복사·참고)는 자유.
+4. **정리**: smart-portfolio-pal 쪽에 반영할 개선이 있으면 해당 레포에서 별도 작업한다. 본 프로젝트에서는 참조만 한다.
+
+참고: [investment-frontend/docs/02-architecture.md](investment-frontend/docs/02-architecture.md) 퍼블리싱 절.

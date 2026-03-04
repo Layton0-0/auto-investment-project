@@ -6,3 +6,5 @@
 # MCP 실제 설정 (템플릿만 커밋)
 mcp.json
 .cursor/mcp.json
+
+smart-portfolio-pal/*
