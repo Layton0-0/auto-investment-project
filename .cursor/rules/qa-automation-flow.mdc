@@ -13,6 +13,8 @@ alwaysApply: true
    `.\scripts\run-full-qa.ps1` 실행 시 다음이 순차 실행된다.  
    - Backend (JUnit): `investment-backend\scripts\run-tests.ps1`  
    - API 시나리오: `.\scripts\run-api-qa.ps1` (환경 변수 `QA_USERNAME`, `QA_PASSWORD` 필요)  
+   - **Python 서비스 QA**: `.\scripts\run-python-qa.ps1` (data-collector 8001, prediction-service 8000)  
+   - **Python 단위 테스트**: `investment-prediction-service`에서 `python -m unittest discover -s tests -p "test_*.py"` (미설치/실패 시 SKIP)  
    - Frontend E2E: `investment-frontend`에서 `npm run e2e`  
    - 보안 점검: `investment-frontend`에서 `npm audit --audit-level=high`  
 

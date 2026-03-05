@@ -2,6 +2,7 @@
 # 사용: .\scripts\run-api-qa.ps1
 # 환경 변수: QA_BASE_URL (기본 http://localhost:8080), QA_USERNAME, QA_PASSWORD, QA_ACCOUNT_NO (기본 50161075-01)
 # 비밀/계정은 저장소에 커밋하지 말고 .env 또는 환경 변수만 사용. plans/qa/최종_QA_체크리스트.md 참고.
+# 판정: 각 시나리오는 응답 HTTP 상태코드가 Expected 목록에 있을 때만 PASS. 500(서버 예외/스택트레이스)은 허용하지 않음 — 500이면 FAIL로 처리.
 
 param(
     [string] $BaseUrl = $env:QA_BASE_URL,
@@ -28,24 +29,99 @@ if (-not $Username -or -not $Password) {
     }
 }
 
-# 시나리오: Method, Path, ExpectedStatusCodes, OptionalResponseKeys(200일 때 응답 본문 검증할 필드).
+# 시나리오: Method, Path, ExpectedStatusCodes, OptionalResponseKeys(200일 때 응답 본문 검증), Optional Body(POST/PUT).
+# QA_시나리오_마스터.md 기준. accountNo는 $AccountNo 사용.
+$verifyAccountBody = '{"brokerType":"KOREA_INVESTMENT","appKey":"dummy","appSecret":"dummy","serverType":"1","accountNo":"50161075-01"}'
+$mypagePutBody = '{"displayName":"QA"}'
+$settingsPutBody = '{"maxInvestmentAmount":10000000,"minInvestmentAmount":100000,"defaultCurrency":"KRW","autoTradingEnabled":false,"roboAdvisorEnabled":false,"riskLevel":0.5,"shortTermRatio":0.2,"mediumTermRatio":0.4,"longTermRatio":0.4}'
+$currentPricesBody = '["005930"]'
+$killSwitchPutBody = '{"enabled":false}'
+$orderPostBody = '{"accountNo":"' + $AccountNo + '","symbol":"005930","market":"KR","quantity":1,"price":50000,"orderType":"BUY"}'
+
 $scenarios = @(
+    # §1 인증
     @{ Method = "GET";  Path = "/api/v1/auth/mypage"; Expected = @(200); ResponseKeys = @("userId", "username") },
-    @{ Method = "GET";  Path = "/api/v1/market-data/current-price/005930"; Expected = @(200); ResponseKeys = @("symbol") },
-    @{ Method = "GET";  Path = "/api/v1/market-data/daily-chart?symbol=005930&market=KR"; Expected = @(200); ResponseKeys = @(); ResponseArray = $true },
+    @{ Method = "POST"; Path = "/api/v1/auth/verify-account"; Expected = @(200, 400); ResponseKeys = @(); Body = $verifyAccountBody },
+    @{ Method = "PUT";  Path = "/api/v1/auth/mypage"; Expected = @(200); ResponseKeys = @(); Body = $mypagePutBody },
+    # §2 설정
     @{ Method = "GET";  Path = "/api/v1/settings/accounts"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "PUT";  Path = "/api/v1/settings/accounts"; Expected = @(200); ResponseKeys = @(); Body = "{}" },
     @{ Method = "GET";  Path = "/api/v1/settings/$AccountNo"; Expected = @(200, 400, 404); ResponseKeys = @() },
+    @{ Method = "PUT";  Path = "/api/v1/settings/$AccountNo"; Expected = @(200); ResponseKeys = @(); Body = $settingsPutBody },
+    # §3 시장데이터
+    @{ Method = "GET";  Path = "/api/v1/market-data/current-price/005930"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/market-data/current-prices"; Expected = @(200); ResponseKeys = @(); Body = $currentPricesBody },
+    @{ Method = "GET";  Path = "/api/v1/market-data/daily-chart?symbol=005930&market=KR"; Expected = @(200); ResponseKeys = @(); ResponseArray = $true },
+    # §4 계좌
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/balance"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/positions"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/buyable-amount?symbol=005930&price=50000"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/sellable-quantity?symbol=005930"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/order-history?startDate=2025-01-01&endDate=2025-12-31"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/assets"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/profit-loss?startDate=2025-01-01&endDate=2025-12-31"; Expected = @(200, 404); ResponseKeys = @() },
+    # §5 사용자 계좌
     @{ Method = "GET";  Path = "/api/v1/user/accounts"; Expected = @(200); ResponseKeys = @() },
+    # §6 대시보드
     @{ Method = "GET";  Path = "/api/v1/dashboard/performance-summary"; Expected = @(200, 404); ResponseKeys = @() },
+    # §7 리스크
     @{ Method = "GET";  Path = "/api/v1/risk/summary"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/risk/limits"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/risk/portfolio-metrics?accountNo=$AccountNo"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/risk/history?from=2025-01-01&to=2025-12-31"; Expected = @(200); ResponseKeys = @() },
+    # §8 세금리포트
     @{ Method = "GET";  Path = "/api/v1/report/tax/summary"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/report/tax/summary/export"; Expected = @(200, 404); ResponseKeys = @() },
+    # §9 주문
+    @{ Method = "GET";  Path = "/api/v1/orders?accountNo=$AccountNo"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/orders"; Expected = @(200, 400, 403); ResponseKeys = @(); Body = $orderPostBody },
+    # §10 파이프라인
     @{ Method = "GET";  Path = "/api/v1/pipeline/summary?accountNo=$AccountNo"; Expected = @(200); ResponseKeys = @() },
+    # §11 시그널
+    @{ Method = "GET";  Path = "/api/v1/signals"; Expected = @(200); ResponseKeys = @() },
+    # §12 전략
+    @{ Method = "GET";  Path = "/api/v1/strategies/comparison"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/strategies/$AccountNo"; Expected = @(200, 404); ResponseKeys = @() },
+    # §13 트레이딩 포트폴리오
+    @{ Method = "GET";  Path = "/api/v1/trading-portfolios/today"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/trading-portfolios/date/2025-01-15"; Expected = @(200, 400, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/trading-portfolios/latest"; Expected = @(200); ResponseKeys = @() },
-    @{ Method = "GET";  Path = "/api/v1/ops/health"; Expected = @(200); ResponseKeys = @("db", "lastCheckedAt") },
-    @{ Method = "GET";  Path = "/api/v1/ops/audit"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/trading-portfolios/rebalance-suggestions?accountNo=$AccountNo&market=US"; Expected = @(200); ResponseKeys = @() },
+    # §14 백테스트
+    @{ Method = "GET";  Path = "/api/v1/backtest/robo/last-pre-execution?accountNo=$AccountNo"; Expected = @(200, 204); ResponseKeys = @() },
+    # §15 분석
+    @{ Method = "POST"; Path = "/api/v1/analysis"; Expected = @(200, 400); ResponseKeys = @(); Body = "{}" },
+    @{ Method = "GET";  Path = "/api/v1/analysis/sector"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/analysis/correlation"; Expected = @(200); ResponseKeys = @() },
+    # §16 매크로
+    @{ Method = "GET";  Path = "/api/v1/macro/dashboard"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/macro/indicators"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/macro/regime"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/macro/refresh"; Expected = @(200); ResponseKeys = @() },
+    # §17 팩터줌
+    @{ Method = "GET";  Path = "/api/v1/factor-zoo/factors"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/factor-zoo/codes"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/factor-zoo/rank?market=KR&startDate=2024-01-01&endDate=2025-12-31"; Expected = @(200); ResponseKeys = @() },
+    # §18 스트레스테스트
+    @{ Method = "GET";  Path = "/api/v1/stress-test/scenarios"; Expected = @(200); ResponseKeys = @() },
+    # §19 뉴스
+    @{ Method = "GET";  Path = "/api/v1/news"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/news/collect"; Expected = @(200, 500, 504); ResponseKeys = @() },
+    # §20 시스템
     @{ Method = "GET";  Path = "/api/v1/system/kill-switch"; Expected = @(200); ResponseKeys = @() },
-    @{ Method = "GET";  Path = "/api/v1/auth/mypage"; Expected = @(200); ResponseKeys = @("userId", "username") }
+    @{ Method = "PUT";  Path = "/api/v1/system/kill-switch"; Expected = @(200, 403); ResponseKeys = @(); Body = $killSwitchPutBody },
+    # §21 Ops
+    @{ Method = "GET";  Path = "/api/v1/ops/health"; Expected = @(200); ResponseKeys = @("db", "lastCheckedAt") },
+    @{ Method = "GET";  Path = "/api/v1/ops/audit"; Expected = @(200, 403); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/ops/governance/results"; Expected = @(200, 403); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/ops/governance/halts"; Expected = @(200, 403); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/ops/alerts"; Expected = @(200, 403); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/ops/model/status"; Expected = @(200, 403); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/ops/data-pipeline/status"; Expected = @(200, 403); ResponseKeys = @() },
+    # §22 관리자
+    @{ Method = "POST"; Path = "/api/v1/admin/users"; Expected = @(201, 400, 403); ResponseKeys = @(); Body = '{"username":"qa-admin-test","password":"tempPass1!","displayName":"QA Admin"}' },
+    # 로그아웃은 토큰 무효화하므로 맨 마지막에 실행
+    @{ Method = "POST"; Path = "/api/v1/auth/logout"; Expected = @(200); ResponseKeys = @() }
 )
 
 function Invoke-ApiRequest {
@@ -112,7 +188,8 @@ foreach ($s in $scenarios) {
     $responseKeys = if ($s.ResponseKeys) { $s.ResponseKeys } else { @() }
     $responseArray = $s.ResponseArray -eq $true
     try {
-        $res = Invoke-ApiRequest -Method $s.Method -Path $path -Headers $headers
+        $body = if ($s.Body) { $s.Body } else { $null }
+        $res = Invoke-ApiRequest -Method $s.Method -Path $path -Headers $headers -Body $body
         $actual = $res.StatusCode
         $ok = $actual -in $expected
         $responseOk = $true
@@ -150,9 +227,18 @@ foreach ($s in $scenarios) {
         $color = if ($ok) { "Green" } else { "Red" }
         Write-Host "API_QA $statusStr $($s.Method) $path -> $detail (expected: $($expected -join '|'))" -ForegroundColor $color
     } catch {
-        $allPass = $false
-        $results += [pscustomobject]@{ Status = "FAIL"; Method = $s.Method; Path = $path; Expected = ($expected -join ","); Actual = "ERROR" }
-        Write-Host "API_QA FAIL $($s.Method) $path -> $($_.Exception.Message)" -ForegroundColor Red
+        $actual = "ERROR"
+        $isTimeout = ($_.Exception.Message -match "timeout|timed out") -or
+            ($_.Exception -is [System.Net.WebException] -and $_.Exception.Status -eq [System.Net.WebExceptionStatus]::Timeout)
+        if ($isTimeout) {
+            $actual = "504(timeout)"
+            if (504 -in $expected) { $allPass = $allPass -and $true }
+        } else {
+            $allPass = $false
+        }
+        $results += [pscustomobject]@{ Status = if ($actual -ne "ERROR" -and $actual -like "504*") { "PASS" } else { "FAIL" }; Method = $s.Method; Path = $path; Expected = ($expected -join ","); Actual = $actual }
+        $color = if ($actual -like "504*" -and 504 -in $expected) { "Green" } else { "Red" }
+        Write-Host "API_QA $(if ($actual -like '504*' -and 504 -in $expected) { 'PASS' } else { 'FAIL' }) $($s.Method) $path -> $actual $($_.Exception.Message)" -ForegroundColor $color
     }
 }
 

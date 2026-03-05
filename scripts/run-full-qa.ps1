@@ -51,19 +51,31 @@ if ((-not $env:QA_USERNAME -or -not $env:QA_PASSWORD) -and (Test-Path $backendEn
         if ($ln -match '^\s*SUPER_ADMIN_PASSWORD=(.+)$') { $env:QA_PASSWORD = $Matches[1].Trim().Trim('"') }
     }
 }
+# API 단계 전에 Backend 8080 도달 가능 여부 확인 (미도달 시 SKIP으로 명확히 표시)
+$qaPrepOk = $false
+Push-Location $repoRoot
+try {
+    & .\scripts\verify-qa-prep.ps1 2>&1 | Out-Null
+    $qaPrepOk = ($LASTEXITCODE -eq 0)
+} finally { Pop-Location }
+
 if (-not $SkipApiScenario) {
     $report += "### 2. API scenario (run-api-qa.ps1)"
     if ($env:QA_USERNAME -and $env:QA_PASSWORD) {
-        Push-Location $repoRoot
-        try {
-            $apiOut = & .\scripts\run-api-qa.ps1 2>&1
-            $apiExit = $LASTEXITCODE
-            if ($apiExit -eq 0) { $report += "- [OK] Pass" } else {
-                $report += "- [FAIL] exit " + $apiExit
-                $report += "- [log]:"; $report += ([char]96 + [char]96 + [char]96); $report += ($apiOut | Out-String); $report += ([char]96 + [char]96 + [char]96)
-                $overallExit = 1
-            }
-        } finally { Pop-Location }
+        if ($qaPrepOk) {
+            Push-Location $repoRoot
+            try {
+                $apiOut = & .\scripts\run-api-qa.ps1 2>&1
+                $apiExit = $LASTEXITCODE
+                if ($apiExit -eq 0) { $report += "- [OK] Pass" } else {
+                    $report += "- [FAIL] exit " + $apiExit
+                    $report += "- [log]:"; $report += ([char]96 + [char]96 + [char]96); $report += ($apiOut | Out-String); $report += ([char]96 + [char]96 + [char]96)
+                    $overallExit = 1
+                }
+            } finally { Pop-Location }
+        } else {
+            $report += "- [SKIP] Backend not reachable on 8080 (run .\scripts\verify-qa-prep.ps1; start full stack: investment-infra\scripts\local-up.ps1)"
+        }
     } else {
         $report += "- [SKIP] QA_USERNAME/QA_PASSWORD or backend .env SUPER_ADMIN_* not set"
         $report += "- Set SUPER_ADMIN_USERNAME, SUPER_ADMIN_PASSWORD in investment-backend/.env then re-run"

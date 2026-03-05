@@ -7,8 +7,20 @@
 ## 1. 전제 조건
 
 - **로컬 풀스택**: `investment-infra/docker-compose.local-full.yml` 기동 (Backend 8080, data-collector 8001, prediction-service 8000, Frontend, Nginx 80).
-- **API 시나리오**: 환경 변수 `QA_USERNAME`, `QA_PASSWORD` 설정 (모의 계정 권장).
+- **API 시나리오**: 환경 변수 `QA_USERNAME`, `QA_PASSWORD` 설정 또는 `investment-backend/.env`에 `SUPER_ADMIN_USERNAME`, `SUPER_ADMIN_PASSWORD` 설정 (모의 계정 권장).
+- **Python QA URL** (선택): `QA_DATA_COLLECTOR_URL`, `QA_PREDICTION_URL` 미설정 시 기본값 `http://localhost:8001`, `http://localhost:8000` 사용.
 - **Python 단위 테스트**: `investment-prediction-service`에서 `pip install -r requirements.txt` 완료 (또는 venv 활성화 후).
+
+### 1.1 QA-Prep 검증 (선택)
+
+전체 QA 실행 전 환경이 준비되었는지 확인하려면:
+
+```powershell
+.\scripts\verify-qa-prep.ps1
+```
+
+- **검사 항목**: Backend 8080, data-collector 8001, prediction-service 8000 포트 응답, API 시나리오용 인증 정보(QA_USERNAME/QA_PASSWORD 또는 backend .env SUPER_ADMIN_*).
+- 통과 시 exit 0, 실패 시 부족한 항목 안내 후 exit 1.
 
 ---
 
@@ -22,6 +34,8 @@
 | 4 | **Python 단위 테스트** (prediction-service unittest) | `-SkipPythonTests` |
 | 5 | Frontend E2E (Playwright) | `-SkipE2e` |
 | 6 | 보안 점검 (npm audit) | `-SkipSecurity` |
+
+**E2E 스펙:** `investment-frontend/e2e/` — landing.spec.ts(랜딩·로그인 링크), login.spec.ts(폼·유효성), dashboard.spec.ts(인증 후 대시보드·자동투자 링크), onboarding.spec.ts(로그인→퀴즈 3단계→원클릭 시작→대시보드), **settings.spec.ts**(인증 후 설정 페이지·제목·초보자/중급자/고급 탭), **auto-invest.spec.ts**(인증 후 자동투자 현황 페이지·제목). dashboard/onboarding/settings/auto-invest는 `E2E_USERNAME`, `E2E_PASSWORD` 필요. 실패 시 스크린샷·트레이스: `investment-frontend/playwright-report/`, `investment-frontend/test-results/`. 상세: [QA_시나리오_점검_요약.md](./QA_시나리오_점검_요약.md) §6.
 
 ---
 

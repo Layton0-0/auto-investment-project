@@ -1,5 +1,14 @@
 {
   "mcpServers": {
+    "excel-reader": {
+      "type": "stdio",
+      "command": "C:/Users/HNW/AppData/Local/Python/pythoncore-3.14-64/python.exe",
+      "args": ["D:/works/pjt/auto-investment-project/mcp-servers/excel-reader/server.py"],
+      "env": {
+        "MCP_EXCEL_PROJECT_ROOT": "D:/works/pjt/auto-investment-project",
+        "PYTHONUNBUFFERED": "1"
+      }
+    },
     "filesystem": {
       "type": "stdio",
       "command": "npx",
