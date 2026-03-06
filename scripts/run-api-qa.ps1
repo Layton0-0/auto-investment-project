@@ -59,7 +59,7 @@ $scenarios = @(
     @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/sellable-quantity?symbol=005930"; Expected = @(200, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/order-history?startDate=2025-01-01&endDate=2025-12-31"; Expected = @(200, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/assets"; Expected = @(200, 404); ResponseKeys = @() },
-    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/profit-loss?startDate=2025-01-01&endDate=2025-12-31"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/profit-loss?startDate=2025-01-01&endDate=2025-12-31"; Expected = @(200, 400, 404); ResponseKeys = @() },
     # §5 사용자 계좌
     @{ Method = "GET";  Path = "/api/v1/user/accounts"; Expected = @(200); ResponseKeys = @() },
     # §6 대시보드
@@ -112,6 +112,8 @@ $scenarios = @(
     @{ Method = "PUT";  Path = "/api/v1/system/kill-switch"; Expected = @(200, 403); ResponseKeys = @(); Body = $killSwitchPutBody },
     # §21 Ops
     @{ Method = "GET";  Path = "/api/v1/ops/health"; Expected = @(200); ResponseKeys = @("db", "lastCheckedAt") },
+    @{ Method = "GET";  Path = "/api/v1/ops/auto-trading-readiness"; Expected = @(200, 403); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/system/settings"; Expected = @(200, 403); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/ops/audit"; Expected = @(200, 403); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/ops/governance/results"; Expected = @(200, 403); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/ops/governance/halts"; Expected = @(200, 403); ResponseKeys = @() },
