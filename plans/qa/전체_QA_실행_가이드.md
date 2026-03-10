@@ -78,8 +78,55 @@ $env:QA_PASSWORD = "your_password"
 
 ---
 
-## 6. 리포트
+## 6. 한국투자증권 API 실제 호출 포함 QA (run-korea-investment-full-qa.ps1)
 
-- 경로: `plans/qa/reports/YYYYMMDD-HHMM-qa-report.md`
+**목적:** 백엔드 단위 테스트 + (선택) 한투 API 실제 호출 통합 테스트 + Backend 8080 기동 시 API 시나리오(계좌/잔고/자산 등이 한투 API 경유)까지 한 번에 실행.
+
+### 6.1 실행 순서
+
+1. **Backend JUnit** — 전체 단위 테스트 실행.
+2. **한국투자증권 통합 테스트** — `RUN_KOREA_INVESTMENT_INTEGRATION=true` 및 모의계좌 env 설정 시에만 실행. 접근토큰 발급 → 주식잔고조회 실제 API 호출 검증.
+3. **API 시나리오** — Backend 8080 도달 시 `run-api-qa.ps1` 실행. 로그인 후 계좌 잔고/보유종목/자산 등 엔드포인트 호출 시 백엔드가 한투 API를 실제로 호출(DB에 한투 API 키·계좌 등록된 경우).
+
+### 6.2 실제 한투 API 통합 테스트 활성화 (모의계좌 권장)
+
+다음 환경 변수 설정 후 테스트 실행 시 통합 테스트가 포함됩니다.
+
+| 환경 변수 | 설명 |
+|-----------|------|
+| `RUN_KOREA_INVESTMENT_INTEGRATION` | `true` 시 통합 테스트 활성화 |
+| `KOREA_INVESTMENT_TEST_APP_KEY` | 모의 App Key |
+| `KOREA_INVESTMENT_TEST_APP_SECRET` | 모의 App Secret |
+| `KOREA_INVESTMENT_TEST_ACCOUNT_NO` | 계좌번호 (8-2 형식, 예: 12345678-01) |
+| `KOREA_INVESTMENT_TEST_SERVER_TYPE` | `1`(모의) 또는 `0`(실거래), 미설정 시 1 |
+
+```powershell
+$env:RUN_KOREA_INVESTMENT_INTEGRATION = "true"
+$env:KOREA_INVESTMENT_TEST_APP_KEY = "모의_앱키"
+$env:KOREA_INVESTMENT_TEST_APP_SECRET = "모의_시크릿"
+$env:KOREA_INVESTMENT_TEST_ACCOUNT_NO = "12345678-01"
+.\scripts\run-korea-investment-full-qa.ps1 -SkipApiScenario
+# 또는 Backend 8080 기동 후 API 시나리오까지: .\scripts\run-korea-investment-full-qa.ps1
+```
+
+통합 테스트만 실행:
+
+```powershell
+$env:RUN_KOREA_INVESTMENT_INTEGRATION = "true"
+# ... 위 env 설정 후
+cd investment-backend
+.\gradlew test --no-daemon --tests "*KoreaInvestmentAccountClientIntegrationTest*"
+```
+
+### 6.3 스크립트 옵션
+
+- `-SkipApiScenario`: API 시나리오 단계 스킵 (Backend JUnit만 실행).
+- Backend 8080 미도달 시 API 시나리오는 자동 스킵.
+
+---
+
+## 7. 리포트
+
+- **run-full-qa.ps1** 결과 경로: `plans/qa/reports/YYYYMMDD-HHMM-qa-report.md`
 - 실패 시 로그·의존성 안내(예: Python 테스트 실패 시 `pip install -r requirements.txt`) 포함.  
 - 규칙: `.cursor/rules/qa-automation-flow.mdc`, `.cursor/rules/test-code-after-agent-by-plan.mdc`

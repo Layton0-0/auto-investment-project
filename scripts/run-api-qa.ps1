@@ -3,6 +3,9 @@
 # 환경 변수: QA_BASE_URL (기본 http://localhost:8080), QA_USERNAME, QA_PASSWORD, QA_ACCOUNT_NO (기본 50161075-01)
 # 비밀/계정은 저장소에 커밋하지 말고 .env 또는 환경 변수만 사용. plans/qa/최종_QA_체크리스트.md 참고.
 # 판정: 각 시나리오는 응답 HTTP 상태코드가 Expected 목록에 있을 때만 PASS. 500(서버 예외/스택트레이스)은 허용하지 않음 — 500이면 FAIL로 처리.
+#
+# [엄격 규칙] 타시스템(한국투자증권·시세 API 등)에 API를 쏘는 구간은 상대한테로부터 200을 받아야 함.
+# → 해당 시나리오는 Expected = 200 만 허용. 4xx/5xx 시 FAIL.
 
 param(
     [string] $BaseUrl = $env:QA_BASE_URL,
@@ -30,51 +33,78 @@ if (-not $Username -or -not $Password) {
 }
 
 # 시나리오: Method, Path, ExpectedStatusCodes, OptionalResponseKeys(200일 때 응답 본문 검증), Optional Body(POST/PUT).
-# QA_시나리오_마스터.md 기준. accountNo는 $AccountNo 사용.
+# QA_시나리오_마스터.md 기준. accountNo는 $AccountNo 사용. 전체 API 스캔 반영(계좌·주문·얼마인지·실제 주문 포함).
 $verifyAccountBody = '{"brokerType":"KOREA_INVESTMENT","appKey":"dummy","appSecret":"dummy","serverType":"1","accountNo":"50161075-01"}'
 $mypagePutBody = '{"displayName":"QA"}'
 $settingsPutBody = '{"maxInvestmentAmount":10000000,"minInvestmentAmount":100000,"defaultCurrency":"KRW","autoTradingEnabled":false,"roboAdvisorEnabled":false,"riskLevel":0.5,"shortTermRatio":0.2,"mediumTermRatio":0.4,"longTermRatio":0.4}'
 $currentPricesBody = '["005930"]'
 $killSwitchPutBody = '{"enabled":false}'
+# 실제 주문 요청 (모의/실 계좌에 따라 200/400/403). 금액·수량·가격 포함.
 $orderPostBody = '{"accountNo":"' + $AccountNo + '","symbol":"005930","market":"KR","quantity":1,"price":50000,"orderType":"BUY"}'
+$backtestBody = '{"startDate":"2024-01-01","endDate":"2024-12-31","market":"KR","strategyType":"SHORT_TERM","initialCapital":10000000}'
+$algoOrderBody = '{"orderId":"qa-algo-1","symbol":"005930","market":"KR","side":"BUY","totalQuantity":10,"limitPrice":50000,"algorithm":"TWAP"}'
+$tcaEstimateBody = '{"symbol":"005930","market":"KR","assetType":"STOCK","side":"BUY","quantity":100,"arrivalPrice":50000,"avgDailyVolume":1000000,"avgSpreadPct":0.1}'
+$tcaAnalyzeBody = '{"symbol":"005930","market":"KR","side":"BUY","quantity":100,"arrivalPrice":50000,"executionPrice":50100,"executionCost":1000}'
+$stressTestBody = '{"positions":[]}'
+$strategyPostBody = '{"accountNo":"' + $AccountNo + '","market":"KR","strategyType":"SHORT_TERM","status":"STOPPED","maxInvestmentAmount":5000000}'
+$strategyStatusBody = '{"status":"STOPPED"}'
+$factorCombinedBody = '{"symbol":"005930","market":"KR","basDt":"2024-06-01","factorWeights":{"MOMENTUM":0.5,"VALUE":0.5}}'
+$factorRankBody = '{"market":"KR","basDt":"2024-06-01","factorWeights":{"MOMENTUM":0.5},"topN":10}'
+$quickStartBody = '{"accountNo":"' + $AccountNo + '","maxInvestmentAmount":5000000}'
 
 $scenarios = @(
     # §1 인증
     @{ Method = "GET";  Path = "/api/v1/auth/mypage"; Expected = @(200); ResponseKeys = @("userId", "username") },
-    @{ Method = "POST"; Path = "/api/v1/auth/verify-account"; Expected = @(200, 400); ResponseKeys = @(); Body = $verifyAccountBody },
+    # 타시스템(KIS 계좌인증) → 200만 허용
+    @{ Method = "POST"; Path = "/api/v1/auth/verify-account"; Expected = @(200); ResponseKeys = @(); Body = $verifyAccountBody },
     @{ Method = "PUT";  Path = "/api/v1/auth/mypage"; Expected = @(200); ResponseKeys = @(); Body = $mypagePutBody },
     # §2 설정
     @{ Method = "GET";  Path = "/api/v1/settings/accounts"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "PUT";  Path = "/api/v1/settings/accounts"; Expected = @(200); ResponseKeys = @(); Body = "{}" },
     @{ Method = "GET";  Path = "/api/v1/settings/$AccountNo"; Expected = @(200, 400, 404); ResponseKeys = @() },
     @{ Method = "PUT";  Path = "/api/v1/settings/$AccountNo"; Expected = @(200); ResponseKeys = @(); Body = $settingsPutBody },
-    # §3 시장데이터
+    @{ Method = "POST"; Path = "/api/v1/settings/quick-start"; Expected = @(200, 400, 404); ResponseKeys = @(); Body = $quickStartBody },
+    # §3 시장데이터 (타시스템: 시세/차트 API) → 200만 허용
+    @{ Method = "GET";  Path = "/api/v1/market-data/ping"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/market-data/current-price/005930"; Expected = @(200, 404); ResponseKeys = @() },
     @{ Method = "POST"; Path = "/api/v1/market-data/current-prices"; Expected = @(200); ResponseKeys = @(); Body = $currentPricesBody },
     @{ Method = "GET";  Path = "/api/v1/market-data/daily-chart?symbol=005930&market=KR"; Expected = @(200); ResponseKeys = @(); ResponseArray = $true },
-    # §4 계좌
-    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/balance"; Expected = @(200, 404); ResponseKeys = @() },
-    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/positions"; Expected = @(200, 404); ResponseKeys = @() },
-    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/buyable-amount?symbol=005930&price=50000"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/market-data/symbols/search?q=005930&market=KR"; Expected = @(200); ResponseKeys = @() },
+    # §4 계좌 (타시스템: 한국투자증권 API) → 200만 허용
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/balance"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/positions"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/positions?market=KR"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/buyable-amount?symbol=005930&price=50000"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/sellable-quantity?symbol=005930"; Expected = @(200, 404); ResponseKeys = @() },
-    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/order-history?startDate=2025-01-01&endDate=2025-12-31"; Expected = @(200, 404); ResponseKeys = @() },
-    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/assets"; Expected = @(200, 404); ResponseKeys = @() },
-    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/profit-loss?startDate=2025-01-01&endDate=2025-12-31"; Expected = @(200, 400, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/order-history?startDate=2025-01-01&endDate=2025-12-31"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/cancelable-orders"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/assets"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/overseas-summary"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/profit-loss?startDate=2025-01-01&endDate=2025-12-31"; Expected = @(200, 400); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/balance-rlz-pl"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/accounts/$AccountNo/profit-loss-status?startDate=2025-01-01&endDate=2025-12-31"; Expected = @(200, 404); ResponseKeys = @() },
     # §5 사용자 계좌
     @{ Method = "GET";  Path = "/api/v1/user/accounts"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/user/accounts/main"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/user/accounts/1"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "PUT";  Path = "/api/v1/user/accounts/1/main"; Expected = @(200, 404); ResponseKeys = @(); Body = "{}" },
     # §6 대시보드
     @{ Method = "GET";  Path = "/api/v1/dashboard/performance-summary"; Expected = @(200, 404); ResponseKeys = @() },
     # §7 리스크
     @{ Method = "GET";  Path = "/api/v1/risk/summary"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/risk/attribution"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/risk/limits"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/risk/portfolio-metrics?accountNo=$AccountNo"; Expected = @(200, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/risk/history?from=2025-01-01&to=2025-12-31"; Expected = @(200); ResponseKeys = @() },
     # §8 세금리포트
     @{ Method = "GET";  Path = "/api/v1/report/tax/summary"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/report/tax/summary/export"; Expected = @(200, 404); ResponseKeys = @() },
-    # §9 주문
+    # §9 주문 (타시스템: KIS 주문 API — POST·cancel-all-pending 은 200만 허용)
     @{ Method = "GET";  Path = "/api/v1/orders?accountNo=$AccountNo"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "POST"; Path = "/api/v1/orders"; Expected = @(200, 400, 403); ResponseKeys = @(); Body = $orderPostBody },
+    @{ Method = "GET";  Path = "/api/v1/orders/qa-dummy-order-id?accountNo=$AccountNo"; Expected = @(200, 400, 404); ResponseKeys = @() },
+    @{ Method = "DELETE"; Path = "/api/v1/orders/qa-dummy-order-id?accountNo=$AccountNo"; Expected = @(204, 400, 404); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/orders/cancel-all-pending?accountNo=$AccountNo"; Expected = @(200); ResponseKeys = @() },
     # §10 파이프라인
     @{ Method = "GET";  Path = "/api/v1/pipeline/summary?accountNo=$AccountNo"; Expected = @(200); ResponseKeys = @() },
     # §11 시그널
@@ -82,13 +112,23 @@ $scenarios = @(
     # §12 전략
     @{ Method = "GET";  Path = "/api/v1/strategies/comparison"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/strategies/$AccountNo"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/strategies/$AccountNo/SHORT_TERM"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/strategies"; Expected = @(200, 400); ResponseKeys = @(); Body = $strategyPostBody },
+    @{ Method = "PUT";  Path = "/api/v1/strategies/$AccountNo/SHORT_TERM/status"; Expected = @(200, 404); ResponseKeys = @(); Body = $strategyStatusBody },
+    @{ Method = "POST"; Path = "/api/v1/strategies/$AccountNo/SHORT_TERM/activate"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/strategies/$AccountNo/SHORT_TERM/stop"; Expected = @(200, 404); ResponseKeys = @() },
     # §13 트레이딩 포트폴리오
     @{ Method = "GET";  Path = "/api/v1/trading-portfolios/today"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/trading-portfolios/date/2025-01-15"; Expected = @(200, 400, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/trading-portfolios/latest"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/trading-portfolios/generate"; Expected = @(200, 500); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/trading-portfolios/rebalance-suggestions?accountNo=$AccountNo&market=US"; Expected = @(200); ResponseKeys = @() },
     # §14 백테스트
+    @{ Method = "POST"; Path = "/api/v1/backtest"; Expected = @(200, 400); ResponseKeys = @(); Body = $backtestBody },
+    @{ Method = "POST"; Path = "/api/v1/backtest/walk-forward"; Expected = @(200, 400); ResponseKeys = @(); Body = '{"startDate":"2023-01-01","endDate":"2024-06-30","market":"KR","strategyType":"SHORT_TERM","initialCapital":10000000}' },
+    @{ Method = "POST"; Path = "/api/v1/backtest/robo"; Expected = @(200, 400); ResponseKeys = @(); Body = '{"startDate":"2024-01-01","endDate":"2024-12-31","initialCapital":10000000}' },
     @{ Method = "GET";  Path = "/api/v1/backtest/robo/last-pre-execution?accountNo=$AccountNo"; Expected = @(200, 204); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/backtest/robo/collect-us-daily"; Expected = @(200, 504); ResponseKeys = @(); Body = "{}" },
     # §15 분석
     @{ Method = "POST"; Path = "/api/v1/analysis"; Expected = @(200, 400); ResponseKeys = @(); Body = "{}" },
     @{ Method = "GET";  Path = "/api/v1/analysis/sector"; Expected = @(200); ResponseKeys = @() },
@@ -96,31 +136,59 @@ $scenarios = @(
     # §16 매크로
     @{ Method = "GET";  Path = "/api/v1/macro/dashboard"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/macro/indicators"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/macro/indicators/GDP"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/macro/indicators/GDP/history?startDate=2024-01-01&endDate=2024-12-31"; Expected = @(200, 404, 500); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/macro/regime"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "POST"; Path = "/api/v1/macro/refresh"; Expected = @(200); ResponseKeys = @() },
     # §17 팩터줌
     @{ Method = "GET";  Path = "/api/v1/factor-zoo/factors"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/factor-zoo/codes"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/factor-zoo/test/MOMENTUM?market=KR&startDate=2024-01-01&endDate=2024-12-31"; Expected = @(200, 404, 500); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/factor-zoo/factors/MOMENTUM"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/factor-zoo/factors/category/VALUE"; Expected = @(200, 400); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/factor-zoo/rank?market=KR&startDate=2024-01-01&endDate=2025-12-31"; Expected = @(200); ResponseKeys = @() },
-    # §18 스트레스테스트
+    @{ Method = "POST"; Path = "/api/v1/factor-zoo/combined-score"; Expected = @(200, 400); ResponseKeys = @(); Body = $factorCombinedBody },
+    @{ Method = "POST"; Path = "/api/v1/factor-zoo/rank-stocks"; Expected = @(200, 400); ResponseKeys = @(); Body = $factorRankBody },
+    # §18 TCA
+    @{ Method = "POST"; Path = "/api/v1/tca/estimate"; Expected = @(200, 400); ResponseKeys = @(); Body = $tcaEstimateBody },
+    @{ Method = "POST"; Path = "/api/v1/tca/analyze"; Expected = @(200, 400); ResponseKeys = @(); Body = $tcaAnalyzeBody },
+    @{ Method = "GET";  Path = "/api/v1/tca/round-trip?market=KR&assetType=STOCK&notional=1000000&quantity=100"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/tca/market-impact?orderQuantity=100&avgDailyVolume=1000000"; Expected = @(200); ResponseKeys = @() },
+    # §19 알고리즘 주문
+    @{ Method = "POST"; Path = "/api/v1/algo-orders/execute"; Expected = @(200, 400); ResponseKeys = @(); Body = $algoOrderBody },
+    @{ Method = "GET";  Path = "/api/v1/algo-orders/qa-dummy-exec-id"; Expected = @(404); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/algo-orders/qa-dummy-exec-id/cancel"; Expected = @(404); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/algo-orders/qa-dummy-exec-id/resume"; Expected = @(404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/algo-orders/active"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/algo-orders/algorithms"; Expected = @(200); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/algo-orders/preview"; Expected = @(200, 400); ResponseKeys = @(); Body = $algoOrderBody },
+    # §20 스트레스테스트
     @{ Method = "GET";  Path = "/api/v1/stress-test/scenarios"; Expected = @(200); ResponseKeys = @() },
-    # §19 뉴스
+    @{ Method = "GET";  Path = "/api/v1/stress-test/scenarios/2008_CRASH"; Expected = @(200, 404); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/stress-test/run/all"; Expected = @(200); ResponseKeys = @(); Body = $stressTestBody },
+    @{ Method = "POST"; Path = "/api/v1/stress-test/run/custom"; Expected = @(200, 400); ResponseKeys = @(); Body = '{"code":"CUSTOM","name":"QA","description":"","positions":[],"assetClassShocks":{}}' },
+    # §21 배치
+    @{ Method = "GET";  Path = "/api/v1/batch/jobs"; Expected = @(200); ResponseKeys = @() },
+    # §22 뉴스
     @{ Method = "GET";  Path = "/api/v1/news"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "POST"; Path = "/api/v1/news/collect"; Expected = @(200, 500, 504); ResponseKeys = @() },
-    # §20 시스템
+    # §23 시스템
     @{ Method = "GET";  Path = "/api/v1/system/kill-switch"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "PUT";  Path = "/api/v1/system/kill-switch"; Expected = @(200, 403); ResponseKeys = @(); Body = $killSwitchPutBody },
-    # §21 Ops
-    @{ Method = "GET";  Path = "/api/v1/ops/health"; Expected = @(200); ResponseKeys = @("db", "lastCheckedAt") },
-    @{ Method = "GET";  Path = "/api/v1/ops/auto-trading-readiness"; Expected = @(200, 403); ResponseKeys = @() },
-    @{ Method = "GET";  Path = "/api/v1/system/settings"; Expected = @(200, 403); ResponseKeys = @() },
+    # §24 Ops
+    @{ Method = "GET";  Path = "/api/v1/ops/health"; Expected = @(200, 403); ResponseKeys = @("db", "lastCheckedAt") },
+    @{ Method = "GET";  Path = "/api/v1/ops/auto-trading-readiness"; Expected = @(200, 403, 404); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/system/settings"; Expected = @(200, 403, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/ops/audit"; Expected = @(200, 403); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/ops/governance/results"; Expected = @(200, 403); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/ops/governance/halts"; Expected = @(200, 403); ResponseKeys = @() },
+    @{ Method = "PUT";  Path = "/api/v1/ops/governance/halts/KR/SHORT_TERM/clear"; Expected = @(204, 403); ResponseKeys = @(); Body = "{}" },
     @{ Method = "GET";  Path = "/api/v1/ops/alerts"; Expected = @(200, 403); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/ops/model/status"; Expected = @(200, 403); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/ops/data-pipeline/status"; Expected = @(200, 403); ResponseKeys = @() },
-    # §22 관리자
+    # §25 트리거 (샘플 1건)
+    @{ Method = "POST"; Path = "/api/v1/trigger/discord-test"; Expected = @(200, 403, 404); ResponseKeys = @() },
+    # §26 관리자
     @{ Method = "POST"; Path = "/api/v1/admin/users"; Expected = @(201, 400, 403); ResponseKeys = @(); Body = '{"username":"qa-admin-test","password":"tempPass1!","displayName":"QA Admin"}' },
     # 로그아웃은 토큰 무효화하므로 맨 마지막에 실행
     @{ Method = "POST"; Path = "/api/v1/auth/logout"; Expected = @(200); ResponseKeys = @() }
