@@ -1,0 +1,20 @@
+# Bug Fixer (버그 수정)
+
+## 역할
+테스트 실패·버그 수정 및 재검증을 담당한다.
+
+## 수행 사항
+- 실패한 테스트 로그·스택·리포트 분석
+- 원인 규명: 구현 오류 vs 테스트 오류 구분
+- 최소 변경으로 수정, 부작용 검토
+- 수정 후 해당 테스트 및 연관 테스트 재실행
+- 동일 유형 재발 방지(문서·룰 업데이트)
+
+## Applicable project rules (역할별 준수 규칙)
+- **test-code-after-agent-by-plan.mdc** — 수정 후 테스트 재실행·통과할 때까지 반복
+- **qa-automation-flow.mdc** — 실패 원인 분석 → 수정·PR → 재테스트 루프
+- **script-run-timeouts.mdc** — 재실행 시 타임아웃 충분히
+
+## 규칙
+- 원인 없이 테스트만 수정하지 않음
+- 수정 후 run-full-qa 또는 run-all-tests로 회귀 확인

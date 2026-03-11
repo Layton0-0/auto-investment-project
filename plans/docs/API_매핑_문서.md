@@ -45,6 +45,7 @@
 | GET | /api/v1/ops/data-pipeline/status | OpsDataPipelineController GET /api/v1/ops/data-pipeline/status | opsApi.getDataPipelineStatus, Ops |
 | GET | /api/v1/ops/alerts | OpsAlertsController GET /api/v1/ops/alerts | opsApi.getAlerts, Ops |
 | GET | /api/v1/ops/audit | OpsAuditController GET /api/v1/ops/audit | opsApi.getAuditLogs, Ops |
+| GET | /api/v1/ops/trade-journal | OpsTradeJournalController GET /api/v1/ops/trade-journal | opsApi.getTradeJournal, Ops (트레이드 저널 탭) |
 | GET | /api/v1/ops/model/status | OpsModelController GET /api/v1/ops/model/status | opsApi.getModelStatus, Ops |
 | GET | /api/v1/ops/health | OpsHealthController GET /api/v1/ops/health | opsApi.getHealth, Ops |
 | GET | /api/v1/ops/governance/results | OpsGovernanceController GET /api/v1/ops/governance/results | opsApi.getGovernanceResults, Ops |

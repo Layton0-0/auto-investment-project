@@ -48,7 +48,7 @@
 | 항목 | 결과 | 원인·수정 포인트 |
 |------|------|------------------|
 | Phase A-2 백엔드 테스트 (gradlew test) | OK | 2026-03-06 |
-| Phase A-2 API QA 62건 (run-api-qa.ps1) | OK | profit-loss 400(미지원) 허용, ops/auto-trading-readiness·system/settings 시나리오 추가 |
+| Phase A-2 API QA 62건 (run-api-qa.ps1) | OK (조건: Backend 기동, QA_USERNAME/QA_PASSWORD 또는 .env SUPER_ADMIN_*) | Docker: 8080. **IntelliJ 개발 시**: `$env:QA_BASE_URL="http://localhost:8084"; .\scripts\run-api-qa.ps1` |
 | 로그인~설정~대시~자동투자~파이프라인~Ops | OK | 동일 스크립트로 검증 |
 
 ---

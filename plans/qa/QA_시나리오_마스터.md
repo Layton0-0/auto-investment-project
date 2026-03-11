@@ -289,6 +289,7 @@
 | GET | /api/v1/ops/auto-trading-readiness | 200, 403, 404 | 미구현 시 404 |
 | GET | /api/v1/system/settings | 200, 403, 404 | 미구현 시 404 |
 | GET | /api/v1/ops/audit | 200, 403 | |
+| GET | /api/v1/ops/trade-journal | 200, 403 | 매매 결정 저널 (TRADE_DECISION 이벤트만) |
 | GET | /api/v1/ops/governance/results | 200, 403 | |
 | GET | /api/v1/ops/governance/halts | 200, 403 | |
 | PUT | /api/v1/ops/governance/halts/{market}/{strategyType}/clear | 204, 403 | noContent |

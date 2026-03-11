@@ -1,8 +1,9 @@
 # API QA 자동화: 로그인 1회 후 Bearer로 QA_시나리오_마스터 기반 엔드포인트 순차 호출.
 # 사용: .\scripts\run-api-qa.ps1
-# 환경 변수: QA_BASE_URL (기본 http://localhost:8080), QA_USERNAME, QA_PASSWORD, QA_ACCOUNT_NO (기본 50161075-01)
+# 환경 변수: QA_BASE_URL (기본 http://localhost:8080), QA_USERNAME, QA_PASSWORD, QA_ACCOUNT_NO (기본 50161075-01), QA_TIMEOUT_SEC (기본 120, 장시간 API용)
 # 비밀/계정은 저장소에 커밋하지 말고 .env 또는 환경 변수만 사용. plans/qa/최종_QA_체크리스트.md 참고.
-# 판정: 각 시나리오는 응답 HTTP 상태코드가 Expected 목록에 있을 때만 PASS. 500(서버 예외/스택트레이스)은 허용하지 않음 — 500이면 FAIL로 처리.
+# 판정: 각 시나리오는 응답 HTTP 상태코드가 Expected 목록에 있을 때만 PASS.
+# 5xx(500/502/503/504 등)는 어떤 시나리오에서도 허용하지 않음 — 5xx 수신 시 무조건 FAIL.
 #
 # [엄격 규칙] 타시스템(한국투자증권·시세 API 등)에 API를 쏘는 구간은 상대한테로부터 200을 받아야 함.
 # → 해당 시나리오는 Expected = 200 만 허용. 4xx/5xx 시 FAIL.
@@ -11,7 +12,8 @@ param(
     [string] $BaseUrl = $env:QA_BASE_URL,
     [string] $Username = $env:QA_USERNAME,
     [string] $Password = $env:QA_PASSWORD,
-    [string] $AccountNo = $env:QA_ACCOUNT_NO
+    [string] $AccountNo = $env:QA_ACCOUNT_NO,
+    [int]    $TimeoutSec = $(if ($env:QA_TIMEOUT_SEC) { [int]$env:QA_TIMEOUT_SEC } else { 120 })
 )
 
 $ErrorActionPreference = "Stop"
@@ -121,14 +123,14 @@ $scenarios = @(
     @{ Method = "GET";  Path = "/api/v1/trading-portfolios/today"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/trading-portfolios/date/2025-01-15"; Expected = @(200, 400, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/trading-portfolios/latest"; Expected = @(200); ResponseKeys = @() },
-    @{ Method = "POST"; Path = "/api/v1/trading-portfolios/generate"; Expected = @(200, 500); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/trading-portfolios/generate"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/trading-portfolios/rebalance-suggestions?accountNo=$AccountNo&market=US"; Expected = @(200); ResponseKeys = @() },
     # §14 백테스트
     @{ Method = "POST"; Path = "/api/v1/backtest"; Expected = @(200, 400); ResponseKeys = @(); Body = $backtestBody },
     @{ Method = "POST"; Path = "/api/v1/backtest/walk-forward"; Expected = @(200, 400); ResponseKeys = @(); Body = '{"startDate":"2023-01-01","endDate":"2024-06-30","market":"KR","strategyType":"SHORT_TERM","initialCapital":10000000}' },
     @{ Method = "POST"; Path = "/api/v1/backtest/robo"; Expected = @(200, 400); ResponseKeys = @(); Body = '{"startDate":"2024-01-01","endDate":"2024-12-31","initialCapital":10000000}' },
     @{ Method = "GET";  Path = "/api/v1/backtest/robo/last-pre-execution?accountNo=$AccountNo"; Expected = @(200, 204); ResponseKeys = @() },
-    @{ Method = "POST"; Path = "/api/v1/backtest/robo/collect-us-daily"; Expected = @(200, 504); ResponseKeys = @(); Body = "{}" },
+    @{ Method = "POST"; Path = "/api/v1/backtest/robo/collect-us-daily"; Expected = @(200); ResponseKeys = @(); Body = "{}" },
     # §15 분석
     @{ Method = "POST"; Path = "/api/v1/analysis"; Expected = @(200, 400); ResponseKeys = @(); Body = "{}" },
     @{ Method = "GET";  Path = "/api/v1/analysis/sector"; Expected = @(200); ResponseKeys = @() },
@@ -137,13 +139,13 @@ $scenarios = @(
     @{ Method = "GET";  Path = "/api/v1/macro/dashboard"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/macro/indicators"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/macro/indicators/GDP"; Expected = @(200, 404); ResponseKeys = @() },
-    @{ Method = "GET";  Path = "/api/v1/macro/indicators/GDP/history?startDate=2024-01-01&endDate=2024-12-31"; Expected = @(200, 404, 500); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/macro/indicators/GDP/history?startDate=2024-01-01&endDate=2024-12-31"; Expected = @(200, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/macro/regime"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "POST"; Path = "/api/v1/macro/refresh"; Expected = @(200); ResponseKeys = @() },
     # §17 팩터줌
     @{ Method = "GET";  Path = "/api/v1/factor-zoo/factors"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/factor-zoo/codes"; Expected = @(200); ResponseKeys = @() },
-    @{ Method = "GET";  Path = "/api/v1/factor-zoo/test/MOMENTUM?market=KR&startDate=2024-01-01&endDate=2024-12-31"; Expected = @(200, 404, 500); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/factor-zoo/test/MOMENTUM?market=KR&startDate=2024-01-01&endDate=2024-12-31"; Expected = @(200, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/factor-zoo/factors/MOMENTUM"; Expected = @(200, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/factor-zoo/factors/category/VALUE"; Expected = @(200, 400); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/factor-zoo/rank?market=KR&startDate=2024-01-01&endDate=2025-12-31"; Expected = @(200); ResponseKeys = @() },
@@ -171,7 +173,7 @@ $scenarios = @(
     @{ Method = "GET";  Path = "/api/v1/batch/jobs"; Expected = @(200); ResponseKeys = @() },
     # §22 뉴스
     @{ Method = "GET";  Path = "/api/v1/news"; Expected = @(200); ResponseKeys = @() },
-    @{ Method = "POST"; Path = "/api/v1/news/collect"; Expected = @(200, 500, 504); ResponseKeys = @() },
+    @{ Method = "POST"; Path = "/api/v1/news/collect"; Expected = @(200); ResponseKeys = @() },
     # §23 시스템
     @{ Method = "GET";  Path = "/api/v1/system/kill-switch"; Expected = @(200); ResponseKeys = @() },
     @{ Method = "PUT";  Path = "/api/v1/system/kill-switch"; Expected = @(200, 403); ResponseKeys = @(); Body = $killSwitchPutBody },
@@ -180,6 +182,7 @@ $scenarios = @(
     @{ Method = "GET";  Path = "/api/v1/ops/auto-trading-readiness"; Expected = @(200, 403, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/system/settings"; Expected = @(200, 403, 404); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/ops/audit"; Expected = @(200, 403); ResponseKeys = @() },
+    @{ Method = "GET";  Path = "/api/v1/ops/trade-journal"; Expected = @(200, 403); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/ops/governance/results"; Expected = @(200, 403); ResponseKeys = @() },
     @{ Method = "GET";  Path = "/api/v1/ops/governance/halts"; Expected = @(200, 403); ResponseKeys = @() },
     @{ Method = "PUT";  Path = "/api/v1/ops/governance/halts/KR/SHORT_TERM/clear"; Expected = @(204, 403); ResponseKeys = @(); Body = "{}" },
@@ -202,7 +205,7 @@ function Invoke-ApiRequest {
         Method          = $Method
         Headers         = $Headers
         UseBasicParsing = $true
-        TimeoutSec      = 30
+        TimeoutSec      = $TimeoutSec
     }
     if ($Body) { $params.Body = $Body; $params.ContentType = "application/json" }
     try {
@@ -262,6 +265,8 @@ foreach ($s in $scenarios) {
         $res = Invoke-ApiRequest -Method $s.Method -Path $path -Headers $headers -Body $body
         $actual = $res.StatusCode
         $ok = $actual -in $expected
+        # 5xx는 어떤 시나리오에서도 허용하지 않음
+        if ($actual -ge 500) { $ok = $false; $allPass = $false }
         $responseOk = $true
         if ($ok -and $actual -eq 200 -and ($responseKeys.Count -gt 0 -or $responseArray)) {
             try {
@@ -297,18 +302,13 @@ foreach ($s in $scenarios) {
         $color = if ($ok) { "Green" } else { "Red" }
         Write-Host "API_QA $statusStr $($s.Method) $path -> $detail (expected: $($expected -join '|'))" -ForegroundColor $color
     } catch {
+        $allPass = $false
         $actual = "ERROR"
         $isTimeout = ($_.Exception.Message -match "timeout|timed out") -or
             ($_.Exception -is [System.Net.WebException] -and $_.Exception.Status -eq [System.Net.WebExceptionStatus]::Timeout)
-        if ($isTimeout) {
-            $actual = "504(timeout)"
-            if (504 -in $expected) { $allPass = $allPass -and $true }
-        } else {
-            $allPass = $false
-        }
-        $results += [pscustomobject]@{ Status = if ($actual -ne "ERROR" -and $actual -like "504*") { "PASS" } else { "FAIL" }; Method = $s.Method; Path = $path; Expected = ($expected -join ","); Actual = $actual }
-        $color = if ($actual -like "504*" -and 504 -in $expected) { "Green" } else { "Red" }
-        Write-Host "API_QA $(if ($actual -like '504*' -and 504 -in $expected) { 'PASS' } else { 'FAIL' }) $($s.Method) $path -> $actual $($_.Exception.Message)" -ForegroundColor $color
+        if ($isTimeout) { $actual = "504(timeout)" }
+        $results += [pscustomobject]@{ Status = "FAIL"; Method = $s.Method; Path = $path; Expected = ($expected -join ","); Actual = $actual }
+        Write-Host "API_QA FAIL $($s.Method) $path -> $actual $($_.Exception.Message)" -ForegroundColor Red
     }
 }
 
