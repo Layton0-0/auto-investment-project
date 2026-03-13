@@ -157,6 +157,27 @@ Authorization: Bearer {{token}}
 Cookie: token={{token}}
 
 ###############################################################################
+# 8-5. Ops 전략 거버넌스 (ADMIN 전용 — Admin 토큰 시 200/204, 비Admin 시 403)
+###############################################################################
+# 거버넌스 검사 결과 (최근 이력)
+GET {{baseUrl}}/api/v1/ops/governance/results?limit=20
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+# 거버넌스 활성 halt 목록
+GET {{baseUrl}}/api/v1/ops/governance/halts
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+# halt 해제 (market/strategyType 존재 시 204, 없어도 204 noContent)
+PUT {{baseUrl}}/api/v1/ops/governance/halts/KR/SHORT_TERM/clear
+Content-Type: application/json
+Authorization: Bearer {{token}}
+Cookie: token={{token}}
+
+{"clearedBy": "admin"}
+
+###############################################################################
 # 9. 로그아웃 — 예상: 200
 ###############################################################################
 POST {{baseUrl}}/api/v1/auth/logout

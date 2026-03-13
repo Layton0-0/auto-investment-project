@@ -281,18 +281,18 @@
 
 ---
 
-## 24. Ops — Bearer (health 등 ADMIN/403 가능)
+## 24. Ops — Bearer (health 등 ADMIN 전용; Admin → 200/204, 비Admin → 403)
 
 | 메서드 | 경로 | 예상 | 비고 |
 |--------|------|------|------|
-| GET | /api/v1/ops/health | 200 | DB·Redis 등 (ADMIN 시 200) |
+| GET | /api/v1/ops/health | 200, 403 | DB·Redis 등 (ADMIN 시 200) |
 | GET | /api/v1/ops/auto-trading-readiness | 200, 403, 404 | 미구현 시 404 |
 | GET | /api/v1/system/settings | 200, 403, 404 | 미구현 시 404 |
 | GET | /api/v1/ops/audit | 200, 403 | |
 | GET | /api/v1/ops/trade-journal | 200, 403 | 매매 결정 저널 (TRADE_DECISION 이벤트만) |
-| GET | /api/v1/ops/governance/results | 200, 403 | |
-| GET | /api/v1/ops/governance/halts | 200, 403 | |
-| PUT | /api/v1/ops/governance/halts/{market}/{strategyType}/clear | 204, 403 | noContent |
+| GET | /api/v1/ops/governance/results | 200, 403 | query: limit(1~500, default 20). Admin 시 200 |
+| GET | /api/v1/ops/governance/halts | 200, 403 | 활성 halt 목록. Admin 시 200 |
+| PUT | /api/v1/ops/governance/halts/{market}/{strategyType}/clear | 204, 403 | body 선택(clearedBy). Admin 시 204 |
 | GET | /api/v1/ops/alerts | 200, 403 | |
 | GET | /api/v1/ops/model/status | 200, 403 | |
 | GET | /api/v1/ops/data-pipeline/status | 200, 403 | |
