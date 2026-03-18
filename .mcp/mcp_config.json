@@ -1,0 +1,44 @@
+{
+  "_comment": "MCP configuration template for Harness development environment. Use placeholders; do not commit real credentials. Copy to .cursor/mcp.json or use env-specific override; values like GITHUB_TOKEN, FIGMA_API_KEY, SSH keys must be set in environment or secret store.",
+  "mcpServers": {
+    "filesystem": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "WORKSPACE_ROOT_ABSOLUTE_PATH"]
+    },
+    "github": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "shrimp-task-manager": {
+      "_description": "Shrimp Task Manager MCP for task lifecycle (todo, in_progress, blocked, done). Required for plan-based and one-task-at-a-time workflow.",
+      "type": "stdio",
+      "command": "YOUR_SHRIMP_MCP_COMMAND",
+      "args": ["YOUR_SHRIMP_MCP_ARGS"]
+    },
+    "korea-investment-api": {
+      "_description": "Korean Investment (KIS) API spec and verification. Use for any backend work touching Korea Investment API (orders, balance, market data). Required by project rules.",
+      "type": "stdio",
+      "command": "YOUR_KOREA_INVESTMENT_MCP_COMMAND",
+      "args": ["YOUR_KOREA_INVESTMENT_MCP_ARGS"],
+      "env": {}
+    },
+    "browser": {
+      "_description": "Browser automation for E2E or UI verification (e.g. Playwright, cursor-ide-browser). Optional but recommended for frontend and full-stack checks.",
+      "type": "stdio",
+      "command": "YOUR_BROWSER_MCP_COMMAND",
+      "args": ["YOUR_BROWSER_MCP_ARGS"]
+    }
+  },
+  "recommendations": [
+    "filesystem: workspace file access for docs and code.",
+    "github: repo, issues, PRs, and CI status for planning and verification.",
+    "shrimp-task-manager: task state and one-task-at-a-time enforcement.",
+    "korea-investment-api: mandatory for Korea Investment API development (see .cursor/rules/MCP.mdc).",
+    "browser: optional for UI/E2E validation and live verification."
+  ]
+}
