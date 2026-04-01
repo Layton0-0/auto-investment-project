@@ -8,3 +8,7 @@ mcp.json
 .cursor/mcp.json
 
 smart-portfolio-pal/*
+
+# 로컬 전용·레거시 경로 (원격에 포함하지 않음)
+shrimp_data/
+investment-front/
