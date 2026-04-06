@@ -12,3 +12,6 @@ smart-portfolio-pal/*
 # 로컬 전용·레거시 경로 (원격에 포함하지 않음)
 shrimp_data/
 investment-front/
+
+# Claude Code 로컬 설정 (공유하지 않음)
+.claude/
