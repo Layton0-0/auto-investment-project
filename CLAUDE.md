@@ -25,8 +25,10 @@ auto-investment-project/
 ├── investment-data-collector/ # Python data pipeline
 ├── investment-prediction-service/ # ML model service
 ├── smart-portfolio-pal/       # Lovable-owned; read-only reference here (do not edit)
-└── .cursor/rules/             # Cursor IDE development rules
+└── .cursor/rules/             # Cursor IDE development rules (단일 소스; AI 팀은 ai-team-harness.mdc 통합)
 ```
+
+**Cursor 규칙**: 루트 `.cursor/rules/`만 유지한다. `investment-backend/.cursor/`에는 중복 규칙을 두지 않으며, 단독으로 서브모듈만 열 때는 해당 README를 참고해 상위 워크스페이스를 연다.
 
 All submodules are development branches (`dev` or `main`) and are committed by reference to the parent repository.
 

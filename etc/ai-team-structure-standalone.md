@@ -160,11 +160,11 @@ You are an autonomous AI software team working on **<프로젝트명>**.
 
 ---
 
-## 4. Cursor 규칙 (최우선 + 워크플로우)
+## 4. Cursor 규칙 (AI 팀 하네스 — 한 파일 권장)
 
-### 4.1 최우선 규칙 (.cursor/rules/ai-team-primary.mdc)
+### 4.1 통합 규칙 파일 (.cursor/rules/ai-team-harness.mdc)
 
-다른 프로젝트에서 Cursor Rules를 쓸 때, 아래 내용으로 **최우선** 규칙 파일을 만든다.
+다른 프로젝트에서 Cursor Rules를 쓸 때, 아래를 **하나의** `alwaysApply: true` 규칙 파일로 묶는 것을 권장한다.
 
 - **Always follow ai-team.md workflow.**
 - **Use the agent roles defined in /agents.**
@@ -174,12 +174,7 @@ You are an autonomous AI software team working on **<프로젝트명>**.
 - 구현 시 해당 역할의 **Applicable project rules** 준수.
 - 테스트 실패 시 Fix로 수정 후 재실행, 통과할 때까지 반복.
 - 완료 전 Reviewer로 품질·보안 점검.
-
-### 4.2 워크플로우 규칙 (.cursor/rules/ai-team-workflow.mdc)
-
-- ai-team.md 워크플로우 준수, agents/ 역할 참조.
-- 테스트 명령: run-all-tests, run-full-qa (및 필요 시 run-backtest).
-- 각 agents/*.md에 **Applicable project rules**가 있으면, 해당 역할 수행 시 반드시 준수.
+- ai-team.md 워크플로우·테스트 명령(run-all-tests, run-full-qa, run-backtest)·프로젝트 경계(백엔드 레이어, 프론트 api 레이어, Python HTTP-only 등)를 같은 파일에 짧게 요약해 둔다.
 
 ---
 
@@ -257,7 +252,7 @@ Reviewer 역할 또는 수동 리뷰 시 사용할 체크리스트 예시.
 ## 11. Custom Instructions (선택)
 
 Cursor Settings → Custom Instructions에 넣을 내용.  
-이미 `.cursor/rules/ai-team-primary.mdc`에 같은 내용을 넣었다면, 프로젝트를 열 때 자동 적용된다.
+이미 `.cursor/rules/ai-team-harness.mdc`에 같은 내용을 넣었다면, 프로젝트를 열 때 자동 적용된다.
 
 ```
 Always follow ai-team.md workflow.
@@ -273,7 +268,7 @@ Always run tests before finishing a task.
 1. 이 문서를 기준으로 새 프로젝트에 `agents/`, `tests/api|strategy|e2e/`, `scripts/` 구조 생성.
 2. `agents/*.md`에 역할별 내용 + **Applicable project rules**를 해당 프로젝트 규칙명으로 채움.
 3. 루트에 `ai-team.md` 생성, 팀 역할·워크플로우·테스트 명령 작성.
-4. `.cursor/rules/ai-team-primary.mdc`, `ai-team-workflow.mdc` 생성.
+4. `.cursor/rules/ai-team-harness.mdc` 생성(최우선 지시 + 워크플로 + 테스트 명령 + 경계 요약 통합).
 5. 필요 시 run-all-tests, run-backtest, run-full-qa 스크립트와 코드 리뷰·전략·시장 데이터 문서 추가.
 6. Cursor에서 해당 프로젝트를 열면 AI 팀 플로우가 최우선 적용되고, 역할별 규칙이 “전문가”처럼 적용됨.
 

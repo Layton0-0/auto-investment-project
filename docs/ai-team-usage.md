@@ -5,8 +5,7 @@
 | 폴더/파일 | 역할 |
 |-----------|------|
 | **agents/** | AI 역할 정의 (planner, architect, backend-dev, frontend-dev, qa, fix, reviewer, deploy, strategy, risk, **market-data-analyst**) |
-| **.cursor/rules/ai-team-primary.mdc** | **최우선** 적용 — Custom Instructions 포함, AI 팀 플로우 우선 |
-| **.cursor/rules/ai-team-workflow.mdc** | AI 팀 루프·테스트 명령·역할별 규칙 참조 |
+| **.cursor/rules/ai-team-harness.mdc** | **최우선** 적용 — AI 팀 플로·테스트 명령·프로젝트 경계·역할 참조 통합 |
 | **docs/ai-team/** | 전략 자동 생성, 백테스트 자동 실행, 코드 리뷰 체크리스트, 실시간 시장 데이터 Agent |
 | **tasks/** | 작업 목록 (Shrimp 연동) |
 | **tests/api**, **tests/strategy**, **tests/e2e** | 테스트 분류(실제 테스트는 각 서브프로젝트 내부) |
