@@ -1,220 +1,54 @@
-# Hooks
+# Cursor hooks (this repo)
 
-Hooks are event-driven automations that fire before or after Claude Code tool executions. They enforce code quality, catch mistakes early, and automate repetitive checks.
+Thin routers in this folder adapt Cursor hook events to the same `scripts/hooks/*.js` implementations vendored from ECC. **Harness root** is `.cursor` (see [`adapter.js`](adapter.js) `getPluginRoot()`); optional override: `CLAUDE_PLUGIN_ROOT` pointing at that folder.
 
-## How Hooks Work
+## Runtime controls
 
-```
-User request → Claude picks a tool → PreToolUse hook runs → Tool executes → PostToolUse hook runs
-```
+- **`ECC_HOOK_PROFILE`**: `minimal` | `standard` (default) | `strict`
+- **`ECC_DISABLED_HOOKS`**: comma-separated hook ids (case-insensitive), e.g. `pre:bash:tmux-reminder,stop:cost-tracker`
 
-- **PreToolUse** hooks run before the tool executes. They can **block** (exit code 2) or **warn** (stderr without blocking).
-- **PostToolUse** hooks run after the tool completes. They can analyze output but cannot block.
-- **Stop** hooks run after each Claude response.
-- **SessionStart/SessionEnd** hooks run at session lifecycle boundaries.
-- **PreCompact** hooks run before context compaction, useful for saving state.
+Ids below match the second argument to `hookEnabled()` in the router, or are marked *always* when not gated.
 
-## Hooks in This Plugin
+## Wired in [`hooks.json`](../hooks.json)
 
-### PreToolUse Hooks
+| Cursor event | Router | Hook id(s) | Profiles | Delegates to `scripts/hooks/` or behavior |
+|--------------|--------|------------|----------|-------------------------------------------|
+| `sessionStart` | `session-start.js` | `session:start` | minimal, standard, strict | `session-start.js` |
+| `sessionEnd` | `session-end.js` | `session:end:marker` | minimal, standard, strict | `session-end-marker.js` |
+| `beforeShellExecution` | *(external)* | — | always | `npx block-no-verify@1.1.2` |
+| `beforeShellExecution` | `before-shell-execution.js` | `pre:bash:dev-server-block` | standard, strict | inline (non-Windows: block dev server outside tmux) |
+| | | `pre:bash:tmux-reminder` | strict only | inline stderr |
+| | | `pre:bash:git-push-reminder` | strict only | inline stderr |
+| `afterShellExecution` | `after-shell-execution.js` | `post:bash:pr-created` | standard, strict | inline PR URL hint |
+| | | `post:bash:build-complete` | standard, strict | inline build hint |
+| `afterFileEdit` | `after-file-edit.js` | *(no id)* | always | `post-edit-accumulator.js`, `post-edit-console-warn.js` |
+| | | `post:edit:design-quality-check` | standard, strict | `design-quality-check.js` |
+| `beforeMCPExecution` | `before-mcp-execution.js` | *always* | — | stderr audit only |
+| `afterMCPExecution` | `after-mcp-execution.js` | *always* | — | stderr result log |
+| `beforeReadFile` | `before-read-file.js` | *always* | — | warn on secret-like paths |
+| `beforeSubmitPrompt` | `before-submit-prompt.js` | *always* | — | warn on secret-like prompt patterns |
+| `subagentStart` | `subagent-start.js` | *always* | — | stderr agent name |
+| `subagentStop` | `subagent-stop.js` | *always* | — | stderr agent name |
+| `beforeTabFileRead` | `before-tab-file-read.js` | *always* | — | **exit 2** on secret-like paths |
+| `afterTabFileEdit` | `after-tab-file-edit.js` | *(no id)* | always | `post-edit-format.js` |
+| `preCompact` | `pre-compact.js` | *(no id)* | always | `pre-compact.js` |
+| `stop` | `stop.js` | `stop:check-console-log` | standard, strict | `check-console-log.js` |
+| | | `stop:session-end` | minimal, standard, strict | `session-end.js` |
+| | | `stop:evaluate-session` | minimal, standard, strict | `evaluate-session.js` |
+| | | `stop:cost-tracker` | minimal, standard, strict | `cost-tracker.js` |
 
-| Hook | Matcher | Behavior | Exit Code |
-|------|---------|----------|-----------|
-| **Dev server blocker** | `Bash` | Blocks `npm run dev` etc. outside tmux — ensures log access | 2 (blocks) |
-| **Tmux reminder** | `Bash` | Suggests tmux for long-running commands (npm test, cargo build, docker) | 0 (warns) |
-| **Git push reminder** | `Bash` | Reminds to review changes before `git push` | 0 (warns) |
-| **Pre-commit quality check** | `Bash` | Runs quality checks before `git commit`: lints staged files, validates commit message format when provided via `-m/--message`, detects console.log/debugger/secrets | 2 (blocks critical) / 0 (warns) |
-| **Doc file warning** | `Write` | Warns about non-standard `.md`/`.txt` files (allows README, CLAUDE, CONTRIBUTING, CHANGELOG, LICENSE, SKILL, docs/, skills/); cross-platform path handling | 0 (warns) |
-| **Strategic compact** | `Edit\|Write` | Suggests manual `/compact` at logical intervals (every ~50 tool calls) | 0 (warns) |
-### PostToolUse Hooks
+## On disk but not connected to Cursor routers
 
-| Hook | Matcher | What It Does |
-|------|---------|-------------|
-| **PR logger** | `Bash` | Logs PR URL and review command after `gh pr create` |
-| **Build analysis** | `Bash` | Background analysis after build commands (async, non-blocking) |
-| **Quality gate** | `Edit\|Write\|MultiEdit` | Runs fast quality checks after edits |
-| **Design quality check** | `Edit\|Write\|MultiEdit` | Warns when frontend edits drift toward generic template-looking UI |
-| **Prettier format** | `Edit` | Auto-formats JS/TS files with Prettier after edits |
-| **TypeScript check** | `Edit` | Runs `tsc --noEmit` after editing `.ts`/`.tsx` files |
-| **console.log warning** | `Edit` | Warns about `console.log` statements in edited files |
+These live under [`.cursor/scripts/hooks/`](../scripts/hooks/). Opt in by extending the matching router in this folder and documenting new ids here (see also [`CURSOR_HARNESS.md`](../CURSOR_HARNESS.md)).
 
-### Lifecycle Hooks
+| Script | Typical reason to leave off |
+|--------|----------------------------|
+| `quality-gate.js` | Cost; overlaps CI |
+| `stop-format-typecheck.js` | Slow on large trees |
+| `pre-bash-commit-quality.js` | Overlaps husky; blocks WIP commits |
+| `mcp-health-check.js` | stdin shape tuned for Claude Code |
+| `post-edit-format.js`, `post-edit-typecheck.js` | Partially covered by accumulator + stop patterns in ECC |
 
-| Hook | Event | What It Does |
-|------|-------|-------------|
-| **Session start** | `SessionStart` | Loads previous context and detects package manager |
-| **Pre-compact** | `PreCompact` | Saves state before context compaction |
-| **Console.log audit** | `Stop` | Checks all modified files for `console.log` after each response |
-| **Session summary** | `Stop` | Persists session state when transcript path is available |
-| **Pattern extraction** | `Stop` | Evaluates session for extractable patterns (continuous learning) |
-| **Cost tracker** | `Stop` | Emits lightweight run-cost telemetry markers |
-| **Desktop notify** | `Stop` | Sends macOS desktop notification with task summary (standard+) |
-| **Session end marker** | `SessionEnd` | Lifecycle marker and cleanup log |
+## Upstream reference
 
-## Customizing Hooks
-
-### Disabling a Hook
-
-Remove or comment out the hook entry in `hooks.json`. If installed as a plugin, override in your `~/.claude/settings.json`:
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Write",
-        "hooks": [],
-        "description": "Override: allow all .md file creation"
-      }
-    ]
-  }
-}
-```
-
-### Runtime Hook Controls (Recommended)
-
-Use environment variables to control hook behavior without editing `hooks.json`:
-
-```bash
-# minimal | standard | strict (default: standard)
-export ECC_HOOK_PROFILE=standard
-
-# Disable specific hook IDs (comma-separated)
-export ECC_DISABLED_HOOKS="pre:bash:tmux-reminder,post:edit:typecheck"
-```
-
-Profiles:
-- `minimal` — keep essential lifecycle and safety hooks only.
-- `standard` — default; balanced quality + safety checks.
-- `strict` — enables additional reminders and stricter guardrails.
-
-### Writing Your Own Hook
-
-Hooks are shell commands that receive tool input as JSON on stdin and must output JSON on stdout.
-
-**Basic structure:**
-
-```javascript
-// my-hook.js
-let data = '';
-process.stdin.on('data', chunk => data += chunk);
-process.stdin.on('end', () => {
-  const input = JSON.parse(data);
-
-  // Access tool info
-  const toolName = input.tool_name;        // "Edit", "Bash", "Write", etc.
-  const toolInput = input.tool_input;      // Tool-specific parameters
-  const toolOutput = input.tool_output;    // Only available in PostToolUse
-
-  // Warn (non-blocking): write to stderr
-  console.error('[Hook] Warning message shown to Claude');
-
-  // Block (PreToolUse only): exit with code 2
-  // process.exit(2);
-
-  // Always output the original data to stdout
-  console.log(data);
-});
-```
-
-**Exit codes:**
-- `0` — Success (continue execution)
-- `2` — Block the tool call (PreToolUse only)
-- Other non-zero — Error (logged but does not block)
-
-### Hook Input Schema
-
-```typescript
-interface HookInput {
-  tool_name: string;          // "Bash", "Edit", "Write", "Read", etc.
-  tool_input: {
-    command?: string;         // Bash: the command being run
-    file_path?: string;       // Edit/Write/Read: target file
-    old_string?: string;      // Edit: text being replaced
-    new_string?: string;      // Edit: replacement text
-    content?: string;         // Write: file content
-  };
-  tool_output?: {             // PostToolUse only
-    output?: string;          // Command/tool output
-  };
-}
-```
-
-### Async Hooks
-
-For hooks that should not block the main flow (e.g., background analysis):
-
-```json
-{
-  "type": "command",
-  "command": "node my-slow-hook.js",
-  "async": true,
-  "timeout": 30
-}
-```
-
-Async hooks run in the background. They cannot block tool execution.
-
-## Common Hook Recipes
-
-### Warn about TODO comments
-
-```json
-{
-  "matcher": "Edit",
-  "hooks": [{
-    "type": "command",
-    "command": "node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const i=JSON.parse(d);const ns=i.tool_input?.new_string||'';if(/TODO|FIXME|HACK/.test(ns)){console.error('[Hook] New TODO/FIXME added - consider creating an issue')}console.log(d)})\""
-  }],
-  "description": "Warn when adding TODO/FIXME comments"
-}
-```
-
-### Block large file creation
-
-```json
-{
-  "matcher": "Write",
-  "hooks": [{
-    "type": "command",
-    "command": "node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const i=JSON.parse(d);const c=i.tool_input?.content||'';const lines=c.split('\\n').length;if(lines>800){console.error('[Hook] BLOCKED: File exceeds 800 lines ('+lines+' lines)');console.error('[Hook] Split into smaller, focused modules');process.exit(2)}console.log(d)})\""
-  }],
-  "description": "Block creation of files larger than 800 lines"
-}
-```
-
-### Auto-format Python files with ruff
-
-```json
-{
-  "matcher": "Edit",
-  "hooks": [{
-    "type": "command",
-    "command": "node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const i=JSON.parse(d);const p=i.tool_input?.file_path||'';if(/\\.py$/.test(p)){const{execFileSync}=require('child_process');try{execFileSync('ruff',['format',p],{stdio:'pipe'})}catch(e){}}console.log(d)})\""
-  }],
-  "description": "Auto-format Python files with ruff after edits"
-}
-```
-
-### Require test files alongside new source files
-
-```json
-{
-  "matcher": "Write",
-  "hooks": [{
-    "type": "command",
-    "command": "node -e \"const fs=require('fs');let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const i=JSON.parse(d);const p=i.tool_input?.file_path||'';if(/src\\/.*\\.(ts|js)$/.test(p)&&!/\\.test\\.|\\.spec\\./.test(p)){const testPath=p.replace(/\\.(ts|js)$/,'.test.$1');if(!fs.existsSync(testPath)){console.error('[Hook] No test file found for: '+p);console.error('[Hook] Expected: '+testPath);console.error('[Hook] Consider writing tests first (/tdd)')}}console.log(d)})\""
-  }],
-  "description": "Remind to create tests when adding new source files"
-}
-```
-
-## Cross-Platform Notes
-
-Hook logic is implemented in Node.js scripts for cross-platform behavior on Windows, macOS, and Linux. A small number of shell wrappers are retained for continuous-learning observer hooks; those wrappers are profile-gated and have Windows-safe fallback behavior.
-
-## Related
-
-- [rules/common/hooks.md](../rules/common/hooks.md) — Hook architecture guidelines
-- [skills/strategic-compact/](../skills/strategic-compact/) — Strategic compaction skill
-- [scripts/hooks/](../scripts/hooks/) — Hook script implementations
+Full Claude Code hook matrix and JSON shape: [everything-claude-code `hooks/README.md`](https://github.com/affaan-m/everything-claude-code/blob/main/hooks/README.md) (or a local clone). For vendored script diff workflow see **Upstream hook sync** in [`CURSOR_HARNESS.md`](../CURSOR_HARNESS.md).

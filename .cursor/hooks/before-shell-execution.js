@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+/**
+ * Pre-shell: optional tmux/dev-server guardrails and push-review hints (non-Windows tmux rules).
+ * JSON pass-through on stdout.
+ */
 const { readStdin, hookEnabled } = require('./adapter');
 const { splitShellSegments } = require('../../scripts/lib/shell-split');
 

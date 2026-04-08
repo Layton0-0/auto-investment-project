@@ -5,6 +5,9 @@ model: sonnet
 tools: [Read, Grep, Glob, Bash]
 ---
 
+**Project rules:** Authoritative norms are in .cursor/rules/*.md and .cursor/ACTIVE_STACKS.md. Prefer those over repeating security, submodule, or domain policy here.
+
+
 # PR Test Analyzer Agent
 
 You review whether a PR's tests actually cover the changed behavior.

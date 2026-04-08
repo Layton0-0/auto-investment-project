@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/** Subagent stop: completion log to stderr; stdout pass-through. */
 const { readStdin } = require('./adapter');
 readStdin().then(raw => {
   try {

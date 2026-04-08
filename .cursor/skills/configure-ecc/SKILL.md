@@ -66,7 +66,7 @@ mkdir -p $TARGET/skills $TARGET/rules
 
 ### 2a: Choose Scope (Core vs Niche)
 
-Default to **Core (recommended for new users)** — copy `.agents/skills/*` plus `skills/search-first/` for research-first workflows. This bundle covers engineering, evals, verification, security, strategic compaction, frontend design, and Anthropic cross-functional skills (article-writing, content-engine, market-research, frontend-slides).
+Default to **Core (recommended for new users)** — copy from the ECC clone’s `.cursor/skills/*` (or this repo’s `.cursor/skills/` as a curated subset). For research-first flows, add `search-first` from the ECC bundle if present. This bundle pattern covers engineering, evals, verification, security, compaction, and frontend skills; niche copies (article-writing, content-engine, etc.) live under ECC or `.cursor/archived-skills/` in this monorepo.
 
 Use `AskUserQuestion` (single select):
 ```

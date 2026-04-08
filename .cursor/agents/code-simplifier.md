@@ -5,6 +5,9 @@ model: sonnet
 tools: [Read, Write, Edit, Bash, Grep, Glob]
 ---
 
+**Project rules:** Authoritative norms are in .cursor/rules/*.md and .cursor/ACTIVE_STACKS.md. Prefer those over repeating security, submodule, or domain policy here.
+
+
 # Code Simplifier Agent
 
 You simplify code while preserving functionality.

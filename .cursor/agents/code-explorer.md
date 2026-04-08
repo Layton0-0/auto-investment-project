@@ -5,6 +5,9 @@ model: sonnet
 tools: [Read, Grep, Glob, Bash]
 ---
 
+**Project rules:** Authoritative norms are in .cursor/rules/*.md and .cursor/ACTIVE_STACKS.md. Prefer those over repeating security, submodule, or domain policy here.
+
+
 # Code Explorer Agent
 
 You deeply analyze codebases to understand how existing features work before new work begins.

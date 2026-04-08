@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+/**
+ * Stop hook: batch format/typecheck and console.log audit on edited files when enabled.
+ */
 const { readStdin, runExistingHook, transformToClaude, hookEnabled } = require('./adapter');
 readStdin().then(raw => {
   const input = JSON.parse(raw || '{}');

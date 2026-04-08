@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+/**
+ * Session end: optional ECC session-end when adapter enables it. Pass-through JSON on stdout.
+ */
 const { readStdin, runExistingHook, transformToClaude, hookEnabled } = require('./adapter');
 readStdin().then(raw => {
   const input = JSON.parse(raw || '{}');

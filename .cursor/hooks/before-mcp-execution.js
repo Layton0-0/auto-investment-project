@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+/**
+ * Pre-MCP: audit log and untrusted-server warning to stderr; pass-through JSON on stdout.
+ */
 const { readStdin } = require('./adapter');
 readStdin().then(raw => {
   try {

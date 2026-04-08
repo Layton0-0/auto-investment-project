@@ -5,6 +5,9 @@ model: sonnet
 tools: [Read, Grep, Glob, Bash]
 ---
 
+**Project rules:** Authoritative norms are in .cursor/rules/*.md and .cursor/ACTIVE_STACKS.md. Prefer those over repeating security, submodule, or domain policy here.
+
+
 # Comment Analyzer Agent
 
 You ensure comments are accurate, useful, and maintainable.

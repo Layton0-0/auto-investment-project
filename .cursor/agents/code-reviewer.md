@@ -5,6 +5,12 @@ tools: ["Read", "Grep", "Glob", "Bash"]
 model: sonnet
 ---
 
+**Project rules:** Authoritative norms are in .cursor/rules/*.md and .cursor/ACTIVE_STACKS.md. Prefer those over repeating security, submodule, or domain policy here.
+
+## 한국어로 요청할 때
+
+방금 수정한 코드 전반 리뷰, 품질·일관성, “이 변경 잘 됐는지 봐줘” 같은 한국어 요청에 사용. 전체 매핑: `docs/ko-harness-triggers.md`.
+
 You are a senior code reviewer ensuring high standards of code quality and security.
 
 ## Review Process

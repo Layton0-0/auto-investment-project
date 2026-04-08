@@ -21,8 +21,16 @@ function readStdin() {
   });
 }
 
+/**
+ * Harness root is `.cursor` (same as ECC install target in ecc-install-state.json).
+ * Scripts live under `.cursor/scripts/hooks/`. Optional override matches run-with-flags.js.
+ */
 function getPluginRoot() {
-  return path.resolve(__dirname, '..', '..');
+  const env = process.env.CLAUDE_PLUGIN_ROOT;
+  if (env && String(env).trim()) {
+    return path.resolve(String(env).trim());
+  }
+  return path.resolve(__dirname, '..');
 }
 
 function transformToClaude(cursorInput, overrides = {}) {

@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+/**
+ * Cursor sessionStart hook: when adapter enables session:start, forwards to legacy session-start.
+ * Stdout is unchanged pass-through of stdin JSON.
+ */
 const { readStdin, runExistingHook, transformToClaude, hookEnabled } = require('./adapter');
 readStdin().then(raw => {
   const input = JSON.parse(raw || '{}');

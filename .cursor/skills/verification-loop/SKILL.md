@@ -1,6 +1,6 @@
 ---
 name: verification-loop
-description: "A comprehensive verification system for Claude Code sessions."
+description: "A comprehensive verification system for Claude Code sessions. 한: 검증루프, 릴리즈전"
 origin: ECC
 ---
 

@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+/**
+ * Post-shell: PR URL logging and optional build analysis when adapter flags allow.
+ */
 const { readStdin, hookEnabled } = require('./adapter');
 
 readStdin().then(raw => {

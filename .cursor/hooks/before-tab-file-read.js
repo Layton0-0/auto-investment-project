@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+/**
+ * Pre-Tab read: block or warn on secret-like paths (aligned with security-baseline).
+ */
 const { readStdin } = require('./adapter');
 readStdin().then(raw => {
   try {

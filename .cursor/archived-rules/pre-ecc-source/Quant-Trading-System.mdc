@@ -1,0 +1,198 @@
+---
+alwaysApply: true
+---
+
+1. Philosophy & First Principles
+
+Capital preservation precedes profit generation. Any strategy that cannot explicitly control downside risk is invalid.
+
+Every model is wrong; robustness is non-negotiable. Strategies must survive regime shifts, tail events, and data imperfections.
+
+Simplicity beats elegance. If a strategy cannot be explained clearly, it is not production-ready.
+
+Automation without observability is malpractice. No black-box execution is allowed.
+
+2. Strategy Design Rules
+
+Strategies must be hypothesis-driven, not data-mined.
+
+Each strategy must clearly define:
+
+Market inefficiency exploited
+
+Time horizon (holding period)
+
+Source of edge (statistical, behavioral, structural)
+
+Avoid single-factor dependency. Prefer orthogonal signal combinations.
+
+Strategy logic must be deterministic and reproducible.
+
+3. Data Integrity & Handling
+
+Assume all external data is flawed unless proven otherwise.
+
+Enforce:
+
+Point-in-time correctness
+
+Survivorship bias elimination
+
+Corporate action normalization
+
+Never reuse backtest-cleaned data in live trading.
+
+All data transformations must be idempotent and auditable.
+
+4. Backtesting & Validation
+
+Backtests must include:
+
+Transaction costs
+
+Slippage
+
+Latency assumptions
+
+No strategy is valid without:
+
+Out-of-sample testing
+
+Walk-forward analysis
+
+Stress testing under extreme scenarios
+
+Reject any result with suspiciously smooth equity curves.
+
+Statistical significance > visual appeal.
+
+5. Risk Management (Non-Negotiable)
+
+Risk is managed at portfolio level first, strategy level second.
+
+Mandatory controls:
+
+Max drawdown limits
+
+Volatility targeting
+
+Position sizing via risk, not conviction
+
+No strategy may exceed predefined:
+
+Exposure limits
+
+Leverage thresholds
+
+Kill-switch logic is required for all automated execution.
+
+6. Execution & Trading Infrastructure
+
+Separate concerns strictly:
+
+Signal generation
+
+Risk checks
+
+Order execution
+
+Execution must be:
+
+Idempotent
+
+Retry-safe
+
+Fail-fast on inconsistencies
+
+Never assume broker/API reliability.
+
+Execution latency assumptions must be explicitly documented.
+
+7. Code Quality & Engineering Discipline
+
+Production trading code is financial infrastructure, not experimental scripts.
+
+Enforce:
+
+Strong typing
+
+Explicit state management
+
+Immutable strategy parameters
+
+No hidden magic numbers.
+
+Configuration must be externalized and version-controlled.
+
+Every critical component must have:
+
+Unit tests
+
+Integration tests
+
+Simulation tests
+
+8. Observability & Monitoring
+
+Real-time monitoring is mandatory for:
+
+PnL
+
+Exposure
+
+Order state
+
+Risk metrics
+
+Alerts must be:
+
+Actionable
+
+Minimal
+
+Noise-free
+
+If a system cannot explain why it traded, it is considered broken.
+
+9. Change Management & Deployment
+
+Strategy changes require:
+
+Version bump
+
+Full backtest rerun
+
+Explicit rationale documentation
+
+Hot-fixes in production are strongly discouraged.
+
+Rollbacks must be instantaneous and safe.
+
+No unreviewed code reaches live capital.
+
+10. Governance & Professional Discipline
+
+Ego has no place in quantitative trading.
+
+Losses are analyzed, not rationalized.
+
+Performance attribution is mandatory.
+
+If a strategy stops making sense, it stops trading—immediately.
+
+11. Ethical & Market Responsibility
+
+Do not design strategies that:
+
+Intentionally manipulate markets
+
+Exploit illegal information
+
+Compliance constraints are design inputs, not afterthoughts.
+
+Assume everything will be audited eventually.
+
+12. Final Rule
+
+A quant system exists to survive first, compound second.
+If it cannot survive without human intervention, it does not deserve capital.

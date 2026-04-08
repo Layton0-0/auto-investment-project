@@ -1,6 +1,6 @@
----
+﻿---
 name: auto-investment-project-patterns
-description: Monorepo layout, submodule workflow, QA/scripts, and commit habits inferred from the parent repo git history. Use when editing auto-investment-project, coordinating submodules, or running full QA.
+description: Monorepo layout, submodule workflow, QA/scripts, and commit habits inferred from the parent repo git history. Use when editing auto-investment-project, coordinating submodules, or running full QA. 한: 모노레포, QA스크립트
 version: 1.0.0
 source: local-git-analysis
 analyzed_commits: 52
@@ -76,12 +76,12 @@ Parent repo itself rarely contains unit tests; validation is orchestration (QA s
 These files or areas often move together in parent history:
 
 - **Submodules + plans**: infra/backend/frontend pointer updates alongside `plans/qa/*` or `plans/docs/*`.
-- **QA hardening**: `.cursor/rules/qa-automation-flow.mdc`, `script-run-timeouts.mdc`, `run-full-qa.ps1`, `run-api-qa.ps1`.
+- **QA hardening**: `.cursor/rules/ai-workflow-qa.md`, `local-dev-hygiene.md`, `run-full-qa.ps1`, `run-api-qa.ps1`.
 - **Tooling**: `.cursor/mcp.json.template` with submodule or rules updates.
 
 ## Limits of this skill
 
-- Does **not** replace `CLAUDE.md` or `.cursor/rules/*.mdc`; it summarizes **git-derived** habits.
+- Does **not** replace `CLAUDE.md` or `.cursor/rules/*.md`; it summarizes **git-derived** habits.
 - **Submodule interiors** were not mined; open the child repo for file-level patterns, reviewers, and CI config.
 
 ---

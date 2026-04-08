@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/** Post-Tab edit: delegate format hook; stdout pass-through. */
 const { readStdin, runExistingHook, transformToClaude } = require('./adapter');
 readStdin().then(raw => {
   try {

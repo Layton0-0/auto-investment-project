@@ -1,4 +1,8 @@
 #!/usr/bin/env node
+/**
+ * Post-file-edit: accumulate paths, console.warn nudge, optional design-quality hook via adapter.
+ * Stdout unchanged pass-through.
+ */
 const { hookEnabled, readStdin, runExistingHook, transformToClaude } = require('./adapter');
 readStdin().then(raw => {
   try {

@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+/**
+ * Pre-submit: detect obvious secret patterns in prompt; stderr warning. Stdout pass-through.
+ */
 const { readStdin } = require('./adapter');
 readStdin().then(raw => {
   try {

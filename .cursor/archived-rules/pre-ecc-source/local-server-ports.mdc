@@ -1,0 +1,34 @@
+---
+description: 로컬 환경 Docker Compose(8080) + 개발 시 직접 구동(8084+5173)
+alwaysApply: true
+---
+
+# 로컬 환경 및 API 포트
+
+- **로컬 풀 스택**: DB·Redis·Backend·Frontend·Nginx 등은 **Docker Compose Local**으로 띄운다.
+  - Compose 파일: `investment-infra/docker-compose.local-full.yml`
+  - 기동: `investment-infra/scripts/local-up.ps1` 또는 `docker compose -f docker-compose.local-full.yml up -d --build`
+  - **이미 사용자가 해당 Compose로 서비스를 띄워 둔 상태**로 작업한다. Agent는 이 스택을 별도로 띄우지 않는다.
+
+- **API Base URL** (로컬, Docker 기준):
+  - **http://localhost:8080** — Backend 컨테이너 직접 (스크립트·QA·Swagger·문서 예시의 기본)
+  - **http://localhost** — Nginx 80, 경로 `/api` 가 Backend로 프록시됨 (브라우저·프론트 연동 시)
+
+- **개발 시 직접 구동 (Docker와 포트 분리)**
+  - **백엔드**: 포트 **8084**. local 설정 상속 후 포트만 8084로 덮어씀. **전제: Docker에서 timescaledb, redis, Python 서비스 먼저 기동.** 백엔드·프론트 제외하고 띄울 때 전용 Compose 사용:
+    - **Compose**: `investment-infra/docker-compose.local-db-only.yml` (timescaledb + redis + prediction-service + data-collector)
+    - **기동**: `investment-infra/scripts/local-up-db-only.ps1` 또는 `cd investment-infra && docker compose -f docker-compose.local-db-only.yml up -d --build`
+    - **중지**: `investment-infra/scripts/local-down-db-only.ps1` 또는 `cd investment-infra && docker compose -f docker-compose.local-db-only.yml down`
+  - IntelliJ/intellij 프로필은 application-intellij.yml에서 DB=investment_portfolio, user=local_pg 등 Docker Compose와 동일하게 접속.
+    - **IntelliJ**: Active profiles `local,intellij` (application-intellij.yml).
+    - **Cursor/Agent**: `investment-backend/scripts/bootRun-agent.ps1` → 프로필 `local,local-agent` (application-local-agent.yml). 동일하게 Docker DB·Redis(5432, 6379) 사용.
+  - **프론트엔드**: 포트 **5173** (Vite 기본). `investment-frontend`에서 `npm run dev` 실행. 직접 구동 백엔드(8084)와 연동하려면 `.env` 또는 `.env.local`에 `VITE_API_BASE_URL=http://localhost:8084` 설정 후 개발 서버 재기동.
+  - **CORS**: 백엔드 기본 CORS(`CORS_ALLOWED_ORIGINS=*`)가 `http://localhost:5173`, `http://127.0.0.1:5173` 을 이미 허용하므로, 5173 → 8084 연동 시 별도 설정 불필요.
+
+- **8084** — 위 직접 구동용 백엔드 포트 (IntelliJ: `intellij`, Cursor: `local-agent` 프로필에서 지정). 사용 후 **반드시 8084 프로세스 종료** (해당 터미널 Ctrl+C). [agent-cleanup.mdc](agent-cleanup.mdc)에 따라 작업 종료 시 8084 등 사용 자원 정리.
+
+- **8083**: 사용하지 않는다.
+
+Agent가 Docker 스택을 대상으로 API 호출·문서 예시를 할 때는 **BaseUrl `http://localhost:8080`**. 직접 구동(8084) 백엔드를 쓸 때만 **BaseUrl `http://localhost:8084`** 사용.
+
+참조: [docker-compose.local-full.yml](../../investment-infra/docker-compose.local-full.yml), [bootRun-agent.ps1](investment-backend/scripts/bootRun-agent.ps1), [agent-cleanup.mdc](agent-cleanup.mdc).

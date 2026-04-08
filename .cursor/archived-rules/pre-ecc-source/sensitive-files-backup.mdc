@@ -1,0 +1,49 @@
+---
+description: 민감 파일 정의 및 보안 폴더 백업 규칙 — 커밋 금지, 프로젝트별 보관 위치
+alwaysApply: true
+---
+
+# 민감 파일 보관 규칙 (Project Rule)
+
+이 프로젝트에서 **민감 파일**은 저장소에 커밋하지 않고, 지정한 **보안 폴더**에 프로젝트별로 백업한다.
+
+## 1. 민감 파일 정의
+
+다음 파일/경로는 민감 파일로 간주하며 **Git에 커밋하지 않는다.**
+
+| 유형 | 파일/패턴 | 비고 |
+|------|-----------|------|
+| 환경 변수 | `.env`, `.env.local`, `.env.*.local` | 템플릿만 커밋: `.env.example` |
+| Spring 시크릿 | `application-secret.yml`, `application-*-secret.yml`, `**/secrets/`, `*.secret` | |
+| MCP 설정 | `mcp.json`, `.cursor/mcp.json` | 템플릿만 커밋: `mcp.json.template` |
+
+- 상세 커밋 금지 규칙: [public-repository-security.mdc](public-repository-security.mdc)
+
+## 2. 보안 폴더 백업 위치
+
+- **기본 경로**: `D:\OneDrive - HKNC\etc\personal\environment\YYYY.MM.DD`
+  - 예: `D:\OneDrive - HKNC\etc\personal\environment\2026.02.23`
+- **폴더 구조**: 위 경로 아래에 **하위 프로젝트별 폴더**를 두고, 해당 프로젝트의 민감 파일만 복사한다.
+
+| 백업 하위 폴더 | 복사 대상 (워크스페이스 내 경로) |
+|----------------|----------------------------------|
+| investment-backend | `investment-backend/.env`, `investment-backend/.../application-*-secret.yml` 등 |
+| investment-infra | `investment-infra/.env` |
+| investment-frontend | `investment-frontend/.env` |
+| investment-data-collector | `investment-data-collector/.env` |
+| investment-prediction-service | `investment-prediction-service/.env` |
+| smart-portfolio-pal | `smart-portfolio-pal/.env` |
+
+- 날짜 폴더(예: `2026.02.23`)는 **백업을 수행한 시점** 기준으로 생성·사용한다. 앞으로도 동일한 방식으로 새 날짜 폴더를 만들어 사용한다.
+
+## 3. Agent/개발자 준수 사항
+
+- **민감 파일을 새로 만들거나 수정한 경우**: 해당 날짜의 보안 폴더(`D:\OneDrive - HKNC\etc\personal\environment\YYYY.MM.DD`)에 **프로젝트별 하위 폴더**를 만들고, `.env` 등 해당 파일을 복사해 둔다.
+- **복사 스크립트**: 보안 폴더 내 `README.md`에 PowerShell 복사 예시가 있으면 그에 따라 실행하거나, 동일한 원칙으로 복사한다.
+- **보안 폴더 자체**는 Git/OneDrive 제외 대상이 아니면 동기화 가능하나, **저장소에는 절대 커밋하지 않는다.**
+
+## 4. 요약
+
+- 민감 파일 = `.env`, `application-*-secret.yml`, `mcp.json` 등 → **커밋 금지**
+- 백업 위치 = `D:\OneDrive - HKNC\etc\personal\environment\YYYY.MM.DD\<하위프로젝트명>\`
+- 앞으로도 같은 규칙으로 날짜별 폴더에 프로젝트별로 나눠 보관한다.
