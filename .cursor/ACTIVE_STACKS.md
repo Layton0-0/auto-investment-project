@@ -15,7 +15,7 @@ Pre-ECC snapshots: `.cursor/archived-rules/pre-ecc-source/`. See also `.cursor/R
 
 ## Daily skills (`.cursor/skills/`)
 
-`agent-introspection-debugging`, `agent-sort`, `ai-regression-testing`, `api-design`, `auto-investment-project-patterns`, `code-tour`, `coding-standards`, `configure-ecc`, `continuous-learning-v2`, `documentation-lookup`, `e2e-testing`, `eval-harness`, `frontend-design`, `frontend-patterns`, `hookify-rules`, `iterative-retrieval`, `java-coding-standards`, `mcp-server-patterns`, `plankton-code-quality`, `python-patterns`, `python-testing`, `search-first`, `skill-stocktake`, `springboot-patterns`, `springboot-tdd`, `springboot-verification`, `strategic-compact`, `tdd-workflow`, `verification-loop`.
+`agent-introspection-debugging`, `agent-sort`, `ai-regression-testing`, `api-design`, `auto-investment-project-patterns`, `code-tour`, `coding-standards`, `commit-push-tasks`, `configure-ecc`, `continuous-learning-v2`, `documentation-lookup`, `e2e-testing`, `eval-harness`, `frontend-design`, `frontend-patterns`, `hookify-rules`, `iterative-retrieval`, `java-coding-standards`, `mcp-server-patterns`, `plankton-code-quality`, `python-patterns`, `python-testing`, `search-first`, `skill-stocktake`, `springboot-patterns`, `springboot-tdd`, `springboot-verification`, `strategic-compact`, `tdd-workflow`, `verification-loop`.
 
 Other stacks: `.cursor/archived-skills/` ([`MANIFEST.md`](archived-skills/MANIFEST.md)).
 

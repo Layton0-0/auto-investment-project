@@ -18,6 +18,7 @@
 | 스프링 구조, 레이어드 API | `.cursor/skills/springboot-patterns/` |
 | 라이브러리 문서, Context7, 공식 API | `.cursor/skills/documentation-lookup/` |
 | 모노레포, 서브모듈, run-all-tests | `.cursor/skills/auto-investment-project-patterns/` |
+| 커밋 푸시, 유의미한 단위, 서브모듈까지 올려 | `.cursor/skills/commit-push-tasks/` |
 | E2E, Playwright | `.cursor/skills/e2e-testing/` |
 | 릴리즈 전 검증 루프 | `.cursor/skills/verification-loop/` |
 | 자바 스타일, Optional, 스트림 | `.cursor/skills/java-coding-standards/` |

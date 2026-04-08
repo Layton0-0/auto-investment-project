@@ -18,6 +18,7 @@ Optional checks: `node .cursor/scripts/validate-skill-agent-description.js` · h
 ## Workflow skill (low overhead)
 
 - **`search-first`** — Before new code or dependencies, search the repo, registries, MCP, and OSS ([`.cursor/skills/search-first/SKILL.md`](skills/search-first/SKILL.md)). No extra hooks; behavior is prompt/skill-driven.
+- **`commit-push-tasks`** — Split work into meaningful commits, push submodules on their branches first, then bump parent pointers ([`.cursor/skills/commit-push-tasks/SKILL.md`](skills/commit-push-tasks/SKILL.md)).
 
 ## Hook profile and complexity budget
 
