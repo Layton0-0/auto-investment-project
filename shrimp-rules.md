@@ -1,4 +1,4 @@
-# Development Guidelines (AI Agent)
+﻿# Development Guidelines (AI Agent)
 
 **Purpose:** Rules for AI Coding Agent. **Project-specific only** — no general development knowledge. All content is based on this repository.
 
@@ -39,6 +39,7 @@
 - **Before coding:** Confirm current task, scope, and acceptance criteria.
 - **After coding:** Run tests/build, then mark task done and update docs (see §7).
 - **Task completion:** After shrimp-task-manager tasks are verified/completed, **always update [02-development-status.md](investment-backend/docs/09-planning/02-development-status.md)** — add to §1 Completed and add a version entry in §5.
+- **Session progress:** If the task **changed repo files**, append **one line** to [docs/program/progress.md](docs/program/progress.md) Session log (`files`, `scope`, `verify`). Omit only when there were **no writes**. See `.cursor/rules/progress-log.md`.
 - **Blocked:** Set task to blocked with a clear reason; create a blocker-resolution task if needed.
 
 ### 3.1 수정사항 수신 시 워크플로우 (사용자 전달 수정사항)
@@ -89,6 +90,7 @@
 | Strategy / factor / formula / parameter | [00-strategy-registry.md](investment-backend/docs/02-architecture/00-strategy-registry.md) + version stack                                                                                                                                                          |
 | Architecture / policy decision          | [decisions.md](investment-backend/docs/decisions.md) (ADR)                                                                                                                                                                                                          |
 | Completed feature / task                | [02-development-status.md](investment-backend/docs/09-planning/02-development-status.md) §1 Completed; adjust §2 In progress, §3 Planned if needed                                                                                                                  |
+| Agent/session touched repo files        | [docs/program/progress.md](docs/program/progress.md) Session log (one line: files, scope, verify)                                                                                                                                                                  |
 | New or changed manual operator step     | [13-manual-operator-tasks.md](investment-backend/docs/06-deployment/13-manual-operator-tasks.md)                                                                                                                                                                    |
 | Data-collector / prediction API 변경    | Backend 호출부·설정 문서. 수집: [10-data-collection-api.md](investment-backend/docs/04-api/10-data-collection-api.md), [investment-data-collector/README.md](investment-data-collector/README.md). 예측: application.yml prediction-service, [01-api-overview.md](investment-backend/docs/04-api/01-api-overview.md) 등.             |
 
@@ -112,7 +114,7 @@
 - **Never** commit or log real secrets, API keys, passwords, or internal IPs.
 - **Never** skip doc updates when API, strategy, or completion status changes (§7).
 - **Never** implement or change Korea Investment API calls without MCP verification.
-- **Never** leave Agent resources uncleaned: remove `agent-build`*, `.agent-build-dir`; stop process on 8084 if started by Agent; follow [agent-cleanup.mdc](.cursor/rules/agent-cleanup.mdc).
+- **Never** leave Agent resources uncleaned: remove `agent-build`*, `.agent-build-dir`; stop process on 8084 if started by Agent; follow [local-dev-hygiene.md](.cursor/rules/local-dev-hygiene.md).
 
 ---
 

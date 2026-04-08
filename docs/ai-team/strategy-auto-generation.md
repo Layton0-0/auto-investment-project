@@ -1,4 +1,4 @@
-# Strategy 자동 생성 AI (전략 자동 생성 플로우)
+﻿# Strategy 자동 생성 AI (전략 자동 생성 플로우)
 
 ## 목적
 
@@ -20,7 +20,7 @@
 
 3. **Strategy Analyst**: 전략 가설·수식·파라미터 정의  
    - 전략 레지스트리에 새 섹션 추가 (버전·변경 이력)  
-   - Quant-Trading-System.mdc 원칙 준수  
+   - quant-and-backtest.md 원칙 준수  
    - 리스크 한도·킬스위치 고려  
 
 4. **Backend Developer**: 구현  

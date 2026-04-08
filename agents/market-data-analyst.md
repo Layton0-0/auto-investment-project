@@ -1,4 +1,4 @@
-# Market Data Analyst (실시간 시장 데이터 Agent)
+﻿# Market Data Analyst (실시간 시장 데이터 Agent)
 
 ## 역할
 
@@ -14,10 +14,10 @@
 
 ## Applicable project rules (역할별 준수 규칙)
 
-- **MCP.mdc** — 한국투자증권 시세·차트·WebSocket API 사용 시 MCP 필수 참조
-- **Quant-Trading-System.mdc** — 데이터 정합성, Point-in-Time
-- **Investment-Banking-Securities-Firm-Level.mdc** — 데이터 보호·로깅(민감정보 마스킹)
-- **logging-masking.mdc** — 계좌·키 등 마스킹
+- **korea-investment-api.md** — 한국투자증권 시세·차트·WebSocket API 사용 시 MCP 필수 참조
+- **quant-and-backtest.md** — 데이터 정합성, Point-in-Time
+- **security-baseline.md** — 데이터 보호·로깅(민감정보 마스킹)
+- **security-baseline.md** — 계좌·키 등 마스킹
 
 ## 규칙
 

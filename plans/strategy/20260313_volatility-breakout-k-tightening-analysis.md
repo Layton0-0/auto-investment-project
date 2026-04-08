@@ -1,4 +1,4 @@
-# 변동성 돌파 k 파라미터 축소 영향 분석 (Strategy Analyst)
+﻿# 변동성 돌파 k 파라미터 축소 영향 분석 (Strategy Analyst)
 
 **일자**: 2026-03-13  
 **역할**: Strategy Analyst (원칙 기반, 체계적, 문서화)  
@@ -116,4 +116,4 @@
 - [00-strategy-registry.md](../investment-backend/docs/02-architecture/00-strategy-registry.md) §2.3 변동성 돌파, §2.8 백테스트 메트릭, §6 계산 수식·파라미터 일람, §7 버전 스택  
 - [18-kr-short-term-strategies-top10.md](../investment-backend/docs/02-architecture/18-kr-short-term-strategies-top10.md) §1 변동성 돌파 (k ∈ [0.3, 0.7])  
 - [backtest-stress-results.md](../investment-backend/docs/02-architecture/backtest-stress-results.md) 스트레스 구간·실행 방법  
-- [.cursor/rules/backtest-quant-research-standards.mdc](../.cursor/rules/backtest-quant-research-standards.mdc) 필수 5종 메트릭·재현 가능 연구
+- [.cursor/rules/quant-and-backtest.md](../.cursor/rules/quant-and-backtest.md) 필수 5종 메트릭·재현 가능 연구

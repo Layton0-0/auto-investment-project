@@ -1,4 +1,4 @@
-# Development Workflow
+﻿# Development Workflow
 
 This document defines the development workflow for the auto-investment project: from task selection to commit and record. It is part of the Harness-based development environment and should be followed by both humans and AI agents.
 
@@ -17,7 +17,7 @@ This document defines the development workflow for the auto-investment project: 
 
 - **Boundaries**: Work stays within the task scope. If the scope grows, create a new task and complete the current one first, or explicitly expand the scope and document it.
 - **Layers**: Respect architecture boundaries (controller → service → domain → infrastructure; no bypass). Use the appropriate skill (e.g. backend_api, frontend_component, refactoring, database_change) from [.cursor/skills/](../../.cursor/skills/).
-- **External API**: For Korea Investment API or other external integrations, use MCP to verify request format and parameters; do not assume from docs alone (see `.cursor/rules/MCP.mdc`).
+- **External API**: For Korea Investment API or other external integrations, use MCP to verify request format and parameters; do not assume from docs alone (see `.cursor/rules/korea-investment-api.md`).
 - **No mixing**: Refactoring and feature development are not mixed in the same task unless explicitly scoped.
 
 ---
@@ -46,9 +46,10 @@ This document defines the development workflow for the auto-investment project: 
 ## 5. Record
 
 - **Post-task**: Run through [.hooks/post-task.md](../../.hooks/post-task.md).
-- **TASK_LOG.md**: Add a row with date, task/scope, verification, and notes.
+- **Progress log**: If this task **changed any tracked files**, append one line to [docs/program/progress.md](../program/progress.md) Session log (`files`, `scope`, `verify`). Skip only when there were **no repo writes** (questions-only, etc.). See `.cursor/rules/progress-log.md`.
 - **CHANGELOG.md**: Update if the change affects repo-wide tooling, workflow, or conventions.
 - **Docs**: Update API docs, decisions, or strategy/backtest docs if behavior or contract changed. Keep `.cursor/memory/project_memory.md` in sync when conventions or key decisions change.
+- **Product status**: For completed features / milestones, still update [investment-backend/docs/09-planning/02-development-status.md](../../investment-backend/docs/09-planning/02-development-status.md) per project rules.
 - **Next task**: If there is a follow-up, create or update the task (e.g. in Shrimp) and mark it as next; document blockers if any.
 
 ---
@@ -61,7 +62,7 @@ This document defines the development workflow for the auto-investment project: 
 | 2. Focused work   | Stay in scope; use skills and architecture boundaries; separate refactor vs feature. |
 | 3. Verification   | Tests and lint pass; behavior confirmed; no secrets. |
 | 4. Commit         | Pre-commit hook; conventional message; one change per commit; no secrets. |
-| 5. Record         | Post-task hook; TASK_LOG; CHANGELOG if needed; docs updated; next task identified. |
+| 5. Record         | Post-task hook; progress.md (if files changed); CHANGELOG if needed; docs + dev-status when needed; next task identified. |
 
 ---
 

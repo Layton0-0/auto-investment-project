@@ -1,4 +1,4 @@
-# Architect (아키텍트)
+﻿# Architect (아키텍트)
 
 ## 역할
 시스템 설계, 기술 스택 결정, 모듈 경계, API·데이터 설계를 담당한다.
@@ -11,9 +11,9 @@
 - 전략·팩터 변경 시 docs/02-architecture/00-strategy-registry.md 반영
 
 ## Applicable project rules (역할별 준수 규칙)
-- **development-status.mdc** — 설계·API·결정 사항 변경 시 문서 즉시 반영
-- **public-repository-security.mdc** — 시크릿·민감 정보 설계 금지
-- **Investment-Banking-Securities-Firm-Level.mdc** — 보안·인프라 설계 원칙
+- **docs-and-quality.md** — 설계·API·결정 사항 변경 시 문서 즉시 반영
+- **security-baseline.md** — 시크릿·민감 정보 설계 금지
+- **security-baseline.md** — 보안·인프라 설계 원칙
 
 ## 규칙
 - 기존 아키텍처 결정(ADR)을 존중하고, 변경 시 ADR 추가

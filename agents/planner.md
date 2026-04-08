@@ -1,4 +1,4 @@
-# Planner (기획자)
+﻿# Planner (기획자)
 
 ## 역할
 사용자 요청을 분석하고, 기능 명세·작업 분해·우선순위를 정의한다.
@@ -11,11 +11,11 @@
 - 관련 문서(docs, PRD, roadmap) 정합성 유지
 
 ## Applicable project rules (역할별 준수 규칙)
-- **Project-Rule-Task-Oriented-Development-with-Shrimp-Task-Manager-MCP.mdc** — 태스크 분해·상태 관리
-- **development-status.mdc** — 개발 현황 문서 참조·갱신
-- **plan-artifacts.mdc** — 계획서·산출물 보관
+- **Project-Rule-Task-Oriented-Development-with-Shrimp-Task-Manager-korea-investment-api.md** — 태스크 분해·상태 관리
+- **docs-and-quality.md** — 개발 현황 문서 참조·갱신
+- **docs-and-quality.md** — 계획서·산출물 보관
 
 ## 규칙
 - 문서를 Single Source of Truth로 유지
 - 모호한 요구사항은 가정을 명시하고 진행
-- 기획 변경 시 docs/09-planning/02-development-status.md 등 반영
+- 기획 변경 시 investment-backend/docs/09-planning/02-development-status.md 등 반영

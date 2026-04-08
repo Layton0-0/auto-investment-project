@@ -2,6 +2,20 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## How to work in this repo (read first)
+
+**Tier 0 → 1 (session start):** Skim the tail of [`docs/program/progress.md`](docs/program/progress.md) Session log (~last 60 lines), then read [`docs/program/00-operating-flow.md`](docs/program/00-operating-flow.md) in full (about 2–3 minutes).
+
+**After any turn that writes repo files:** append one Session log line per [`.cursor/rules/progress-log.md`](.cursor/rules/progress-log.md). **Larger milestones** still go to [`investment-backend/docs/09-planning/02-development-status.md`](investment-backend/docs/09-planning/02-development-status.md) per [`.cursor/rules/docs-and-quality.md`](.cursor/rules/docs-and-quality.md).
+
+**Verify:** [`docs/verification/README.md`](docs/verification/README.md) (`run-all-tests` / `run-full-qa`, checklist links).
+
+**Rules & harness:** [`.cursor/rules/`](.cursor/rules/); agents [`.cursor/AGENTS.md`](.cursor/AGENTS.md); Korean trigger map [`docs/ko-harness-triggers.md`](docs/ko-harness-triggers.md).
+
+**Routine workflow detail** (Shrimp, roles, hooks) lives in [`ai-team.md`](ai-team.md) and [`shrimp-rules.md`](shrimp-rules.md)—not duplicated here.
+
+**Editing this file:** Only for **constitutional** repo-wide changes (monorepo layout, tool baselines, entrypoint role). For everyday updates, use [`docs/program/00-operating-flow.md`](docs/program/00-operating-flow.md), `.cursor/rules/`, `AGENTS.md`, `ai-team.md`, or `shrimp-rules.md`. Policy: [`.cursor/rules/claude-md-scope.md`](.cursor/rules/claude-md-scope.md).
+
 ## Project Overview
 
 This is a **distributed auto-investment system** with multiple microservices, designed for algorithmic trading using Korean securities APIs. The system analyzes portfolio performance and executes trades automatically based on quantitative strategies.
@@ -25,7 +39,9 @@ auto-investment-project/
 ├── investment-data-collector/ # Python data pipeline
 ├── investment-prediction-service/ # ML model service
 ├── smart-portfolio-pal/       # Lovable-owned; read-only reference here (do not edit)
-└── .cursor/rules/             # Cursor IDE development rules (단일 소스; AI 팀은 ai-team-harness.mdc 통합)
+├── docs/program/              # Operating spine, progress.md, archive
+├── docs/verification/         # Verification hub (commands, checklist links)
+└── .cursor/rules/             # Cursor IDE rules (단일 소스; 짧은 영문 .md, 예: ai-workflow-qa.md)
 ```
 
 **Cursor 규칙**: 루트 `.cursor/rules/`만 유지한다. `investment-backend/.cursor/`에는 중복 규칙을 두지 않으며, 단독으로 서브모듈만 열 때는 해당 README를 참고해 상위 워크스페이스를 연다.
@@ -170,31 +186,35 @@ See: `investment-backend/docs/05-database/01-database-schema.md`
 
 ## Important Development Rules
 
-These rules are enforced via Cursor `.cursor/rules/*.mdc` files. Key ones:
+These rules are enforced via Cursor `.cursor/rules/*.md` files. Key ones:
 
 ### General
-- **Agent cleanup** (`agent-cleanup.mdc`): Delete `agent-build/`, stop port 8084 processes, clean temp files after work
-- **Document sync** (`development-status.mdc`): Update docs/architecture/API whenever code changes; don't commit code-only changes
-- **Public repo security** (`public-repository-security.mdc`): Never commit API keys, credentials, or sensitive files
+- **Security baseline** ([`security-baseline.md`](.cursor/rules/security-baseline.md)): Public repos; no secrets in git; mask PII in logs; use security-reviewer for auth and trading code
+- **Docs & quality** ([`docs-and-quality.md`](.cursor/rules/docs-and-quality.md)): Keep `investment-backend/docs/09-planning/02-development-status.md` current; plan artifacts; tests after planned work; no mocks outside tests
+- **Local dev & agent hygiene** ([`local-dev-hygiene.md`](.cursor/rules/local-dev-hygiene.md)): Ports 8080/8084/5173; clean `agent-build/`; stop 8084; long timeouts for QA scripts
 
 ### Backend
-- **No mock data outside tests** (`no-mock-data-outside-tests.mdc`): Use real APIs or test fixtures only
-- **External API tests** (`external-api-test-strict-200.mdc`): Verify HTTP 200 responses from Korean Investment API
-- **Quant standards** (`backtest-quant-research-standards.mdc`): Factor validation, statistical rigor for strategy development
-- **Timeout handling** (`script-run-timeouts.mdc`): Agent scripts have strict timeouts; Gradle daemon must be managed
+- **Java / Spring** ([`java-backend.md`](.cursor/rules/java-backend.md)): Layered API, BigDecimal for money, validation, Resilience4j, tests
+- **Korea Investment API** ([`korea-investment-api.md`](.cursor/rules/korea-investment-api.md)): Confirm specs via MCP; integration tests expect HTTP 200; sandbox only
+- **Quant & backtest** ([`quant-and-backtest.md`](.cursor/rules/quant-and-backtest.md)): Risk-first; PIT/OOS; see strategy registry doc
 
 ### Frontend
-- **React principles** (`React-Development-Rules-Senior-Level.mdc`):
-  - Pure function of state; no side effects in render
-  - Separate logic from presentation
-  - Prefer `useReducer` for complex state
-  - Never call hooks conditionally; intentional omissions need comments
-  - No useEffect business logic; extract to services
-- **Security** (`React-Security-Development-Rules-Senior-Level.mdc`): Input sanitization, no dangling event listeners, safe DOM operations
+- **React / TypeScript** ([`frontend-react-ts.md`](.cursor/rules/frontend-react-ts.md)): Pure state, immutability, hooks for API logic, Vitest/Playwright, sanitization, a11y
 
-### Domain-Specific
-- **Investment/Banking rules** (`Investment-Banking-Securities-Firm-Level.mdc`): Decimal precision for money (BigDecimal backend, `toFixed(2)` frontend), audit logging for trades
-- **Logging/Masking** (`logging-masking.mdc`): Mask account numbers, API credentials in logs
+### Monorepo & harness
+- **Boundaries** ([`monorepo-boundaries.md`](.cursor/rules/monorepo-boundaries.md)): Layering; do not edit `smart-portfolio-pal/` (submodule)
+- **AI / Shrimp / QA** ([`ai-workflow-qa.md`](.cursor/rules/ai-workflow-qa.md)): Task lifecycle; run QA scripts until green; verify CD after infra pushes
+- **Python services** ([`python-services.md`](.cursor/rules/python-services.md)): Typing, tests, HTTP contracts with Java backend
+
+### Cursor harness (skills / agents / hooks)
+
+Curated skills live under `.cursor/skills/`; agent presets under `.cursor/agents/`; hook wiring in [`.cursor/hooks.json`](.cursor/hooks.json). **Lists and archives:** [`.cursor/ACTIVE_STACKS.md`](.cursor/ACTIVE_STACKS.md). **Policy and hook matrix:** [`.cursor/CURSOR_HARNESS.md`](.cursor/CURSOR_HARNESS.md), [`.cursor/hooks/README.md`](.cursor/hooks/README.md). **Agent orchestration (this repo):** [`.cursor/AGENTS.md`](.cursor/AGENTS.md).
+
+Harness root is the `.cursor` directory; vendored hook scripts live under `.cursor/scripts/hooks/`. If a subprocess expects ECC’s `CLAUDE_PLUGIN_ROOT`, set it to the absolute path of `.cursor` in this repository.
+
+**Claude Code vs Cursor:** Same ECC-derived scripts and hook ids (`ECC_HOOK_PROFILE`, `ECC_DISABLED_HOOKS`), but **different entry points** — Claude Code uses the plugin `hooks.json` with `${CLAUDE_PLUGIN_ROOT}`; Cursor uses `.cursor/hooks.json` and thin routers in `.cursor/hooks/`. See CURSOR_HARNESS “Claude Code vs Cursor”.
+
+Use the **`search-first`** skill before adding libraries or new utilities; heavier ECC hook scripts stay **off by default** in Cursor (see CURSOR_HARNESS — tune with `ECC_HOOK_PROFILE` / `ECC_DISABLED_HOOKS` if you wire more). **Korean prompts → skills/agents map:** [`docs/ko-harness-triggers.md`](docs/ko-harness-triggers.md).
 
 ## Submodule Management
 
@@ -221,9 +241,9 @@ git clone --recurse-submodules https://github.com/Layton0-0/auto-investment-proj
 git submodule update --init --recursive
 ```
 
-## Documentation
+## Product documentation (Tier 3)
 
-Key docs (read before major changes):
+Use these when changing product behavior (not for daily session flow—that is [`docs/program/00-operating-flow.md`](docs/program/00-operating-flow.md)).
 
 - **API**: `investment-backend/docs/04-api/` — Endpoints, request/response schemas, Korean Investment API mapping
 - **Architecture**: `investment-backend/docs/02-architecture/` — Design patterns, quantitative strategy framework, frontend integration
@@ -292,8 +312,8 @@ npm run test:e2e:report            # View last run report
 - **Gradle cache**: First build is slow; subsequent builds use cache (`build/` folder)
 - **Hot reload**: Frontend (Vite) hot-reloads CSS/JS; backend requires restart
 - **Cursor AI**: Use context from `.cursor/rules/` — it will guide your code style
-- **Task tracking**: Use `plans/` directory for adhoc notes; `docs/09-planning/02-development-status.md` for official progress
+- **Task tracking**: Use `plans/` for adhoc notes; **`investment-backend/docs/09-planning/02-development-status.md`** for official backlog/completed; **`docs/program/progress.md`** for per-session file-change lines (agents)
 
 ---
 
-**Last Updated**: 2026-04-01
+**Last Updated**: 2026-04-08

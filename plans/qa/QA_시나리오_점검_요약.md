@@ -1,4 +1,4 @@
-# QA 시나리오 점검 요약
+﻿# QA 시나리오 점검 요약
 
 **작성일:** 2026-03-05  
 **목적:** 각 QA 단계별 프로세스·시나리오 포함 여부 점검 및 태스크 단위 정리.
@@ -9,14 +9,14 @@
 
 | 단계 | 내용 | 스크립트/명령 | 프로세스 문서화 |
 |------|------|----------------|-----------------|
-| 1 | Backend JUnit | investment-backend\scripts\run-tests.ps1 | run-tests.ps1 주석, script-run-timeouts.mdc |
+| 1 | Backend JUnit | investment-backend\scripts\run-tests.ps1 | run-tests.ps1 주석, local-dev-hygiene.md |
 | 2 | API 시나리오 | scripts\run-api-qa.ps1 | QA_시나리오_마스터.md, 전체_QA_실행_가이드.md |
 | 3 | Python 서비스 QA | scripts\run-python-qa.ps1 | 전체_QA_실행_가이드.md §4 |
 | 4 | Python 단위 테스트 | py/python -m unittest discover (prediction-service) | README.md, run-full-qa.ps1 내 SKIP 조건 |
 | 5 | Frontend E2E | investment-frontend npm run e2e | playwright.config.ts, 가이드 §2 |
 | 6 | 보안 점검 | npm audit --audit-level=high | run-full-qa.ps1 |
 
-**실패 루프:** qa-automation-flow.mdc에 5→6→7단계(원인 분석→수정·PR→재테스트) 정의. **단, 규칙에는 Python QA·Python 단위테스트가 명시되어 있지 않음** — run-full-qa.ps1은 6단계 포함.
+**실패 루프:** ai-workflow-qa.md에 5→6→7단계(원인 분석→수정·PR→재테스트) 정의. **단, 규칙에는 Python QA·Python 단위테스트가 명시되어 있지 않음** — run-full-qa.ps1은 6단계 포함.
 
 ---
 
@@ -24,7 +24,7 @@
 
 - **실행 프로세스:** run-tests.ps1 → gradlew test --no-daemon. 임시 빌드(agent-build-*) 사용 시 실행 후 삭제.
 - **시나리오:** 단위/통합 테스트 전체(JUnit discover). 별도 “시나리오 목록” 문서 없음 — 소스 기준.
-- **포함 여부:** 실행 순서·실패 시 로그(콘솔 출력)·타임아웃 권장(script-run-timeouts.mdc) 문서화됨.
+- **포함 여부:** 실행 순서·실패 시 로그(콘솔 출력)·타임아웃 권장(local-dev-hygiene.md) 문서화됨.
 - **점검 포인트:** run-tests.ps1와 03-test-execution.md 등 문서 일치, 실패 시 로그/경로 안내 존재 여부.
 
 ---
@@ -94,7 +94,7 @@
 | 4 | QA-PythonTests 시나리오 점검 | 73e95a1d-4f21-41af-ace6-049bab8c1c02 | unittest discover 범위·스킵 조건·README·run-full-qa.ps1 동기화 |
 | 5 | QA-E2E 시나리오 점검 | 1f6124a6-a45c-4c51-a758-8d937072cabd | E2E 스펙 목록·전제·실패 시 리포트 경로 가이드 반영 |
 | 6 | QA-Security 시나리오 점검 | 868f0d82-93c8-4ebe-8140-22bc0737e853 | npm audit 조건·실패 시 조치 안내 문서 |
-| 7 | 전체 QA 파이프라인 점검 | 1ed426fe-893f-45cc-93e1-25250e757dfd | run-full-qa.ps1 6단계 순서·실패 루프·qa-automation-flow.mdc 동기화(Python 단계 명시) |
+| 7 | 전체 QA 파이프라인 점검 | 1ed426fe-893f-45cc-93e1-25250e757dfd | run-full-qa.ps1 6단계 순서·실패 루프·ai-workflow-qa.md 동기화(Python 단계 명시) |
 
 ---
 

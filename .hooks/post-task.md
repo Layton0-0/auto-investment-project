@@ -2,14 +2,10 @@
 
 Use this checklist after completing a task. These are safety checks, not automation replacements.
 
-## 1. TASK_LOG update
+## 1. Progress log (`docs/program/progress.md`)
 
-- [ ] **TASK_LOG.md** (at repo root) has been updated with:
-  - Date
-  - Task / scope (short description)
-  - Verification performed (e.g. “tests passed”, “E2E passed”, “manual check”)
-  - Any notes (e.g. follow-up task id, known limitation)
-- [ ] One row per completed task; keep the table concise and traceable.
+- [ ] If this task **modified, added, or deleted** files in the repo: **Session log** in [docs/program/progress.md](../docs/program/progress.md) has a new line with **files**, **scope**, **verify** (see `.cursor/rules/progress-log.md`).
+- [ ] If the task was **read-only** (no writes): progress line is optional.
 
 ## 2. CHANGELOG update
 
@@ -33,7 +29,7 @@ Use this checklist after completing a task. These are safety checks, not automat
 ## 5. Handoff / next task
 
 - [ ] If there is a follow-up task (e.g. from Shrimp or plan), it is created or updated and marked as next.
-- [ ] Blockers or dependencies for the next task are documented (e.g. in TASK_LOG or task description).
+- [ ] Blockers or dependencies for the next task are documented (e.g. in progress.md, Shrimp task, or PR).
 
 ---
 

@@ -1,166 +1,59 @@
-# Everything Claude Code (ECC) — Agent Instructions
+# Agent instructions (auto-investment-project)
 
-This is a **production-ready AI coding plugin** providing 47 specialized agents, 181 skills, 79 commands, and automated hook workflows for software development.
+**First:** Before orchestrating agents or doing implementation work in this repo, read the repository root [`CLAUDE.md`](../CLAUDE.md) (see [`.cursor/rules/claude-bootstrap.md`](rules/claude-bootstrap.md)). It defines **How to work**, then the spine and verification flow below.
 
-**Version:** 1.10.0
+**Operating flow:** [docs/program/00-operating-flow.md](../docs/program/00-operating-flow.md) (spine, Tier 0–3). **After editing files:** append one line to [docs/program/progress.md](../docs/program/progress.md) per [progress-log.md](rules/progress-log.md). **Verify:** [docs/verification/README.md](../docs/verification/README.md).
 
-## Core Principles
+This file is **project-scoped**. The canonical list of **daily agent presets** in this repo is [`.cursor/ACTIVE_STACKS.md`](ACTIVE_STACKS.md) (section “Daily agent presets”). Each preset is a markdown file under [`.cursor/agents/`](agents/).
 
-1. **Agent-First** — Delegate to specialized agents for domain tasks
-2. **Test-Driven** — Write tests before implementation, 80%+ coverage required
-3. **Security-First** — Never compromise on security; validate all inputs
-4. **Immutability** — Always create new objects, never mutate existing ones
-5. **Plan Before Execute** — Plan complex features before writing code
+**Note:** Merging all mandatory commands into `CLAUDE.md` alone (“constitution”) is a **separate follow-up**; keep using `.cursor/rules/` as the enforcement source until then.
 
-## Available Agents
+The upstream **Everything Claude Code** plugin ships many more agents; copies used less often live under [`.cursor/archived-agents/`](archived-agents/) — see [`MANIFEST.md`](archived-agents/MANIFEST.md). Do not assume every ECC agent name exists in `.cursor/agents/`.
 
-| Agent | Purpose | When to Use |
-|-------|---------|-------------|
-| planner | Implementation planning | Complex features, refactoring |
-| architect | System design and scalability | Architectural decisions |
-| tdd-guide | Test-driven development | New features, bug fixes |
-| code-reviewer | Code quality and maintainability | After writing/modifying code |
-| security-reviewer | Vulnerability detection | Before commits, sensitive code |
-| build-error-resolver | Fix build/type errors | When build fails |
-| e2e-runner | End-to-end Playwright testing | Critical user flows |
-| refactor-cleaner | Dead code cleanup | Code maintenance |
-| doc-updater | Documentation and codemaps | Updating docs |
-| cpp-reviewer | C++ code review | C++ projects |
-| cpp-build-resolver | C++ build errors | C++ build failures |
-| docs-lookup | Documentation lookup via Context7 | API/docs questions |
-| go-reviewer | Go code review | Go projects |
-| go-build-resolver | Go build errors | Go build failures |
-| kotlin-reviewer | Kotlin code review | Kotlin/Android/KMP projects |
-| kotlin-build-resolver | Kotlin/Gradle build errors | Kotlin build failures |
-| database-reviewer | PostgreSQL/Supabase specialist | Schema design, query optimization |
-| python-reviewer | Python code review | Python projects |
-| java-reviewer | Java and Spring Boot code review | Java/Spring Boot projects |
-| java-build-resolver | Java/Maven/Gradle build errors | Java build failures |
-| loop-operator | Autonomous loop execution | Run loops safely, monitor stalls, intervene |
-| harness-optimizer | Harness config tuning | Reliability, cost, throughput |
-| rust-reviewer | Rust code review | Rust projects |
-| rust-build-resolver | Rust build errors | Rust build failures |
-| pytorch-build-resolver | PyTorch runtime/CUDA/training errors | PyTorch build/training failures |
-| typescript-reviewer | TypeScript/JavaScript code review | TypeScript/JavaScript projects |
+## Daily agents (this repo)
 
-## Agent Orchestration
+| Agent | Purpose |
+|-------|---------|
+| architect | System design and scalability |
+| build-error-resolver | Fix build/type errors |
+| code-architect | Feature architecture / blueprint |
+| code-explorer | Deep codebase tracing |
+| code-reviewer | After substantive edits |
+| code-simplifier | Clarity and simplification |
+| comment-analyzer | Comment quality / rot |
+| database-reviewer | PostgreSQL / schema / queries |
+| doc-updater | Docs and codemaps |
+| docs-lookup | Library docs via Context7 |
+| e2e-runner | Playwright E2E |
+| java-build-resolver | Gradle/Java build failures |
+| java-reviewer | Spring Boot / Java review |
+| performance-optimizer | Performance work |
+| planner | Complex features / refactors |
+| pr-test-analyzer | PR test coverage quality |
+| python-reviewer | Python review |
+| refactor-cleaner | Dead code / consolidation |
+| security-reviewer | Auth, secrets, sensitive paths |
+| silent-failure-hunter | Swallowed errors / bad fallbacks |
+| tdd-guide | Tests-first workflow |
+| typescript-reviewer | TS/JS review |
 
-Use agents proactively without user prompt:
-- Complex feature requests → **planner**
-- Code just written/modified → **code-reviewer**
-- Bug fix or new feature → **tdd-guide**
-- Architectural decision → **architect**
-- Security-sensitive code → **security-reviewer**
-- Autonomous loops / loop monitoring → **loop-operator**
-- Harness config reliability and cost → **harness-optimizer**
+## When to delegate (orchestration)
 
-Use parallel execution for independent operations — launch multiple agents simultaneously.
+- Complex feature or large refactor → **planner** (then implement).
+- Code just written or changed → **code-reviewer**; security-sensitive areas → **security-reviewer**.
+- New feature or bug fix with tests → **tdd-guide**.
+- Architecture or cross-service design → **architect** or **code-architect**.
+- Independent tasks → multiple agents in parallel when helpful.
 
-## Security Guidelines
+## Principles (details in rules)
 
-**Before ANY commit:**
-- No hardcoded secrets (API keys, passwords, tokens)
-- All user inputs validated
-- SQL injection prevention (parameterized queries)
-- XSS prevention (sanitized HTML)
-- CSRF protection enabled
-- Authentication/authorization verified
-- Rate limiting on all endpoints
-- Error messages don't leak sensitive data
+Always-on expectations are in [`.cursor/rules/`](rules/) — especially [`security-baseline.md`](rules/security-baseline.md), [`docs-and-quality.md`](rules/docs-and-quality.md), and stack-specific rules. Prefer those files for security checklists, coverage expectations, and git conventions rather than duplicating long policy here.
 
-**Secret management:** NEVER hardcode secrets. Use environment variables or a secret manager. Validate required secrets at startup. Rotate any exposed secrets immediately.
+## Workflow surface
 
-**If security issue found:** STOP → use security-reviewer agent → fix CRITICAL issues → rotate exposed secrets → review codebase for similar issues.
+- **Skills:** [`.cursor/skills/`](skills/) — canonical workflow knowledge for this harness.
+- **Hooks / profiles:** [`.cursor/CURSOR_HARNESS.md`](CURSOR_HARNESS.md), [`.cursor/hooks/README.md`](hooks/README.md).
 
-## Coding Style
+ECC version vendored at last install: see `source.repoVersion` in [`.cursor/ecc-install-state.json`](ecc-install-state.json).
 
-**Immutability (CRITICAL):** Always create new objects, never mutate. Return new copies with changes applied.
-
-**File organization:** Many small files over few large ones. 200-400 lines typical, 800 max. Organize by feature/domain, not by type. High cohesion, low coupling.
-
-**Error handling:** Handle errors at every level. Provide user-friendly messages in UI code. Log detailed context server-side. Never silently swallow errors.
-
-**Input validation:** Validate all user input at system boundaries. Use schema-based validation. Fail fast with clear messages. Never trust external data.
-
-**Code quality checklist:**
-- Functions small (<50 lines), files focused (<800 lines)
-- No deep nesting (>4 levels)
-- Proper error handling, no hardcoded values
-- Readable, well-named identifiers
-
-## Testing Requirements
-
-**Minimum coverage: 80%**
-
-Test types (all required):
-1. **Unit tests** — Individual functions, utilities, components
-2. **Integration tests** — API endpoints, database operations
-3. **E2E tests** — Critical user flows
-
-**TDD workflow (mandatory):**
-1. Write test first (RED) — test should FAIL
-2. Write minimal implementation (GREEN) — test should PASS
-3. Refactor (IMPROVE) — verify coverage 80%+
-
-Troubleshoot failures: check test isolation → verify mocks → fix implementation (not tests, unless tests are wrong).
-
-## Development Workflow
-
-1. **Plan** — Use planner agent, identify dependencies and risks, break into phases
-2. **TDD** — Use tdd-guide agent, write tests first, implement, refactor
-3. **Review** — Use code-reviewer agent immediately, address CRITICAL/HIGH issues
-4. **Capture knowledge in the right place**
-   - Personal debugging notes, preferences, and temporary context → auto memory
-   - Team/project knowledge (architecture decisions, API changes, runbooks) → the project's existing docs structure
-   - If the current task already produces the relevant docs or code comments, do not duplicate the same information elsewhere
-   - If there is no obvious project doc location, ask before creating a new top-level file
-5. **Commit** — Conventional commits format, comprehensive PR summaries
-
-## Workflow Surface Policy
-
-- `skills/` is the canonical workflow surface.
-- New workflow contributions should land in `skills/` first.
-- `commands/` is a legacy slash-entry compatibility surface and should only be added or updated when a shim is still required for migration or cross-harness parity.
-
-## Git Workflow
-
-**Commit format:** `<type>: <description>` — Types: feat, fix, refactor, docs, test, chore, perf, ci
-
-**PR workflow:** Analyze full commit history → draft comprehensive summary → include test plan → push with `-u` flag.
-
-## Architecture Patterns
-
-**API response format:** Consistent envelope with success indicator, data payload, error message, and pagination metadata.
-
-**Repository pattern:** Encapsulate data access behind standard interface (findAll, findById, create, update, delete). Business logic depends on abstract interface, not storage mechanism.
-
-**Skeleton projects:** Search for battle-tested templates, evaluate with parallel agents (security, extensibility, relevance), clone best match, iterate within proven structure.
-
-## Performance
-
-**Context management:** Avoid last 20% of context window for large refactoring and multi-file features. Lower-sensitivity tasks (single edits, docs, simple fixes) tolerate higher utilization.
-
-**Build troubleshooting:** Use build-error-resolver agent → analyze errors → fix incrementally → verify after each fix.
-
-## Project Structure
-
-```
-agents/          — 47 specialized subagents
-skills/          — 181 workflow skills and domain knowledge
-commands/        — 79 slash commands
-hooks/           — Trigger-based automations
-rules/           — Always-follow guidelines (common + per-language)
-scripts/         — Cross-platform Node.js utilities
-mcp-configs/     — 14 MCP server configurations
-tests/           — Test suite
-```
-
-`commands/` remains in the repo for compatibility, but the long-term direction is skills-first.
-
-## Success Metrics
-
-- All tests pass with 80%+ coverage
-- No security vulnerabilities
-- Code is readable and maintainable
-- Performance is acceptable
-- User requirements are met
+**Korean prompts:** see [`docs/ko-harness-triggers.md`](../docs/ko-harness-triggers.md) for intent → skill / agent / rule mapping.

@@ -1,4 +1,4 @@
-# 전체 QA 실행 가이드 (Backend + API + Python + E2E + 보안)
+﻿# 전체 QA 실행 가이드 (Backend + API + Python + E2E + 보안)
 
 **목적:** 파이썬 프로젝트 포함 전체 자동화 QA 실행 절차 및 응답 검증 범위 정리.
 
@@ -129,4 +129,4 @@ cd investment-backend
 
 - **run-full-qa.ps1** 결과 경로: `plans/qa/reports/YYYYMMDD-HHMM-qa-report.md`
 - 실패 시 로그·의존성 안내(예: Python 테스트 실패 시 `pip install -r requirements.txt`) 포함.  
-- 규칙: `.cursor/rules/qa-automation-flow.mdc`, `.cursor/rules/test-code-after-agent-by-plan.mdc`
+- 규칙: `.cursor/rules/ai-workflow-qa.md`, `.cursor/rules/docs-and-quality.md`

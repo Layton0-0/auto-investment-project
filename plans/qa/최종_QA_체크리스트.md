@@ -1,4 +1,4 @@
-# 퀀트트레이더 시스템 최종 QA 체크리스트
+﻿# 퀀트트레이더 시스템 최종 QA 체크리스트
 
 **작성일:** 2026-02-21  
 **목적:** Shrimp Task Manager 기반 전체 시나리오 실행 결과·수정 이력·Known Issue·재실행 방법 정리.
@@ -66,7 +66,7 @@
   - Python 서비스 QA: `run-python-qa.ps1` — data-collector(8001) GET /health, prediction-service(8000) GET /, GET /api/v1/health, POST /api/v1/predict, POST /api/v1/predict/batch **상태 코드 및 응답 스키마·값 검증**.
   - Python 단위 테스트: investment-prediction-service에서 `python -m unittest discover` (실행 전 `pip install -r requirements.txt` 필요).
   - 환경 변수: `QA_USERNAME`, `QA_PASSWORD` (API), `QA_DATA_COLLECTOR_URL`, `QA_PREDICTION_URL` (Python QA, 기본 8001/8000). 풀스택은 docker-compose.local-full.yml 기동 전제.
-  - 리포트: `plans/qa/reports/YYYYMMDD-HHMM-qa-report.md`. 실패 시 Agent는 해당 리포트와 로그를 참고해 원인 분석·코드 수정·재테스트 루프 수행. (규칙: `.cursor/rules/qa-automation-flow.mdc`)
+  - 리포트: `plans/qa/reports/YYYYMMDD-HHMM-qa-report.md`. 실패 시 Agent는 해당 리포트와 로그를 참고해 원인 분석·코드 수정·재테스트 루프 수행. (규칙: `.cursor/rules/ai-workflow-qa.md`)
 
 ---
 

@@ -1,4 +1,4 @@
-# Agent Commands by Order (Chained, No Duplication)
+﻿# Agent Commands by Order (Chained, No Duplication)
 
 **Purpose**: Commands only, in execution order. **Each step consumes the previous agent’s output** so the pipeline runs without repeating the same request.  
 Personas: [04-agent-commands.md](04-agent-commands.md). Workflow: [01-agent-workflow-quant.md](01-agent-workflow-quant.md).
@@ -200,7 +200,7 @@ Using the Python service task below (or in context), implement in investment-dat
 
 [PASTE TASK — e.g. "Add DART keyword '무상증자' to signal-relevant list; set signalRelevant and eventType prefix; add unit test."]
 
-- Follow .cursor/rules/python-quant-developer.mdc and Quant-Trading-System.mdc; type hints, structured logging, no secrets.
+- Follow .cursor/rules/python-services.md and quant-and-backtest.md; type hints, structured logging, no secrets.
 ```
 
 ---

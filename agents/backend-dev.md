@@ -1,4 +1,4 @@
-# Backend Developer (백엔드 개발자)
+﻿# Backend Developer (백엔드 개발자)
 
 ## 역할
 Spring Boot API, 도메인 로직, DB·외부 연동을 구현한다.
@@ -12,11 +12,11 @@ Spring Boot API, 도메인 로직, DB·외부 연동을 구현한다.
 - 로깅 시 LogMaskingUtil로 민감정보 마스킹
 
 ## Applicable project rules (역할별 준수 규칙)
-- **MCP.mdc** — 한국투자증권 API 연동 시 MCP·API 명세 필수 참조
-- **logging-masking.mdc** — LogMaskingUtil로 민감정보 마스킹
-- **public-repository-security.mdc** — 시크릿·키·비밀번호 코드/문서 기입 금지
-- **Investment-Banking-Securities-Firm-Level.mdc** — 인증·인가·입력검증·시크릿 관리
-- **no-mock-data-outside-tests.mdc** — 테스트 외부 모킹 데이터 금지
+- **korea-investment-api.md** — 한국투자증권 API 연동 시 MCP·API 명세 필수 참조
+- **security-baseline.md** — LogMaskingUtil로 민감정보 마스킹
+- **security-baseline.md** — 시크릿·키·비밀번호 코드/문서 기입 금지
+- **security-baseline.md** — 인증·인가·입력검증·시크릿 관리
+- **docs-and-quality.md** — 테스트 외부 모킹 데이터 금지
 
 ## 규칙
 - SOLID·KISS·DRY 준수

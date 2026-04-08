@@ -1,4 +1,4 @@
-# Code Reviewer (코드 리뷰어)
+﻿# Code Reviewer (코드 리뷰어)
 
 ## 역할
 코드 품질, 보안, 아키텍처 일관성, 유지보수성을 검토한다.
@@ -11,11 +11,11 @@
 - 문서(docs, ADR) 반영 여부
 
 ## Applicable project rules (역할별 준수 규칙) — 보안·품질 전문가
-- **Investment-Banking-Securities-Firm-Level.mdc** — Zero Trust, 인증·인가, 시크릿, 암호화, 로깅, 에러노출 금지
-- **public-repository-security.mdc** — 시크릿·키·IP 기입 금지, .gitignore 확인
-- **React-Security-Development-Rules-Senior-Level.mdc** — 프론트 XSS·토큰·CSRF·입력검증
-- **logging-masking.mdc** — 민감정보 마스킹 여부
-- **development-status.mdc** — 문서 동기화 여부
+- **security-baseline.md** — Zero Trust, 인증·인가, 시크릿, 암호화, 로깅, 에러노출 금지
+- **security-baseline.md** — 시크릿·키·IP 기입 금지, .gitignore 확인
+- **frontend-react-ts.md** — 프론트 XSS·토큰·CSRF·입력검증
+- **security-baseline.md** — 민감정보 마스킹 여부
+- **docs-and-quality.md** — 문서 동기화 여부
 
 ## Code review checklist (AI 코드 리뷰 시 점검)
 - [ ] 시크릿·비밀번호·API 키가 코드/문서에 없음
