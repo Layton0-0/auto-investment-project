@@ -28,3 +28,7 @@
 - [18:00] cursor-agent | files: CLAUDE.md, .cursor/rules/claude-md-scope.md, docs/program/00-operating-flow.md, docs/program/progress.md, docs/verification/README.md | scope: CLAUDE 헌법 문안(How to work, repo tree, Tier3 docs), claude-md-scope 봉인, verification CD 링크, 스파인 migration 링크 및 Follow-ups 절, progress 로그 | verify: — | refs: plan claude.md 개편 및 후속
 - [19:30] cursor-agent | files: .cursor/rules/claude-bootstrap.md, .cursor/AGENTS.md, docs/program/progress.md | scope: 필수 CLAUDE 읽기 플랜 — claude-bootstrap.md(alwaysApply), AGENTS.md 선행 읽기 문단 | verify: — | refs: plan 필수 CLAUDE.md 읽기
 - [20:15] cursor-agent | files: investment-backend/docs/**, investment-frontend/docs/01-security.md, .cursor/skills/commit-push-tasks/SKILL.md, .cursor/ACTIVE_STACKS.md, .cursor/CURSOR_HARNESS.md, docs/ko-harness-triggers.md, docs/program/progress.md, investment-backend, investment-frontend | scope: 서브모듈 문서 링크 커밋·푸시(dev/main), commit-push-tasks 스킬·하네스 등록, 부모 서브모듈 포인터 | verify: git push | refs: 사용자 요청
+
+### 2026-05-13
+
+- [12:00] cursor-agent | files: README.md, LICENSE, SECURITY.md, CONTRIBUTING.md, docs/program/progress.md | scope: 루트 공개용 README·MIT·보안·기여 가이드, progress 로그 | verify: git push | refs: 사용자 요청(MIT·커밋 푸시)
